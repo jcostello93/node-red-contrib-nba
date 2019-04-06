@@ -1,0 +1,1120 @@
+<!-- START Database -->
+<script type="text/javascript">
+    function oneditprepare() {
+        function hideExtraActions(){
+            $("#node-action-get_type").hide();
+            $("#node-action-first_name").hide();
+            $("#node-action-last_name").hide();
+            $("#node-action-team_name").hide();
+            $("#node-action-source").hide();
+            $("#node-action-object_id").hide();
+        }
+
+        function showActions(){
+            var database_type = $("#node-input-database_type option:selected").val();
+            var get_type = $("#node-input-get_type option:selected").val();
+            var source = $("#node-input-source option:selected").val();
+
+            if (database_type === "get data") {
+                $("#node-action-get_type").show();
+                if (get_type === "one player") {
+                    if (source === "name") {
+                        $("#node-action-first_name").show();
+                        $("#node-action-last_name").show();
+                    }
+                    else if (source === "id") {
+                        $("#node-action-object_id").show();
+                    }
+                    
+                    $("#node-action-source").show();
+                    
+                } else if (get_type === "one team"){
+                    if (source === "name") {
+                        $("#node-action-team_name").show();
+                    }
+                    else if (source === "id") {
+                        $("#node-action-object_id").show();
+                    }
+                    $("#node-action-source").show();
+                } 
+            }
+        }
+
+        $("#node-input-database_type").change(function() {
+            hideExtraActions()
+            showActions()
+        });
+
+        $("#node-input-get_type").change(function() {
+            hideExtraActions()
+            showActions()
+        });
+
+        $("#node-input-source").change(function() {
+            hideExtraActions()
+            showActions()
+        });
+
+        hideExtraActions()
+        showActions()
+    }
+
+    RED.nodes.registerType('database',{
+        category: 'nba',
+        color: '#a6bbcf',
+        defaults: {
+            name: {value:""},
+            database_type: {value:"get data"},
+            get_type: {value:"all players"},
+            first_name: {value:""},
+            last_name: {value:""},
+            team_name: {value:""},
+            source: {value: "name"},
+            object_id: {value: ""}
+        },
+        inputs:1,
+        outputs:1,
+        align: "left",
+        color:"#A2B2D0",
+        label: function() {
+            if (this.database_type === "get data") {
+                return this.name||"get " + this.get_type;
+            } else {
+                return this.name || "update database";
+            }
+        },
+        oneditprepare: oneditprepare
+    });
+</script>
+
+<script type="text/x-red" data-template-name="database">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> name</label>
+        <input type="text" id="node-input-name" placeholder="name">
+    </div>
+    <div class="form-row" id="node-action-database_type"> 
+        <label for="node-input-database_type"><i class="fa fa-wrench"></i> function</label>
+        <select type="text" id="node-input-database_type" style="display: inline-block; width: 250px; vertical-align: top;">
+            <option value="get data" outputs="1">get data</option>
+            <option value="update" outputs="1">update</option>            
+        </select>
+    </div>
+    <div class="form-row" id="node-action-get_type"> 
+        <label for="node-input-get_type"><i class="fa fa-wrench"></i> get</label>
+        <select type="text" id="node-input-get_type" style="display: inline-block; width: 250px; vertical-align: top;">
+            <option value="all players" outputs="1">all players</option>
+            <option value="all teams" outputs="1">all teams</option>
+            <option value="one player" outputs="1">one player</option>
+            <option value="one team" outputs="1">one team</option>
+        </select>
+    </div>
+    <div class="form-row" id="node-action-source"> 
+        <label for="node-input-source"><i class="fa fa-wrench"></i> by</label>
+        <select type="text" id="node-input-source" style="display: inline-block; width: 250px; vertical-align: top;">
+            <option value="name" outputs="1">name</option>
+            <option value="id" outputs="1">id</option>
+        </select>
+    </div>
+    <div class="form-row" id="node-action-first_name">
+        <label for="node-input-first_name"><i class="icon-tag"></i> first name</label>
+        <input type="text" id="node-input-first_name" placeholder="first name">
+    </div>
+    <div class="form-row" id="node-action-last_name">
+        <label for="node-input-last_name"><i class="icon-tag"></i> last name</label>
+        <input type="text" id="node-input-last_name" placeholder="last name">
+    </div>
+    <div class="form-row" id="node-action-team_name">
+        <label for="node-input-team_name"><i class="icon-tag"></i> team name</label>
+        <input type="text" id="node-input-team_name" placeholder="team name">
+    </div>
+    <div class="form-row" id="node-action-object_id">
+        <label for="node-input-object_id"><i class="icon-tag"></i> id</label>
+        <input type="text" id="node-input-object_id" placeholder="id">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="database">
+    <p>Get players or teams from their names or id's. Or, get the most up-to-date player database information.</p>
+    
+    <h3>Inputs</h3>
+        <dl class="message-properties">
+        <dt>get <span class="property-type">selection</span></dt>
+        <dd> the data to be retrieved</dd>
+        <dt class="optional">by <span class="property-type">selection</span></dt>
+        <dd> get one player/team by id or name</dd>
+        <dt class="optional">id <span class="property-type">string</span></dt>
+        <dd> id of the player/team</dd>
+        <dt class="optional"> first name <span class="property-type">string</span></dt>
+        <dd> first name of the player</dd>
+        <dt class="optional"> last name <span class="property-type">string</span></dt>
+        <dd> last name of the player</dd>
+        <dt class="optional"> team name <span class="property-type">string</span></dt>
+        <dd> name of the team</dd>
+    </dl>
+
+    <h3>Outputs</h3>
+    <ol class="node-ports">
+        <li> 
+            <dl class="message-properties">
+            <dt>payload <span class="property-type">object | array</span></dt>
+            <dd> full object(s) of the player(s)/team(s)</dd>
+            </dl>
+        </li>
+        <li>Standard error
+            <dl class="message-properties">
+            <dt>payload <span class="property-type">string</span></dt>
+            <dd>the standard error of the command.</dd>
+            </dl>
+        </li>
+    </ol>
+
+    <h3>Details</h3>
+    <p>Use this node to get access to the players and teams in the NBA, as well as their unique id's.</p>
+    <p>The id's refer to the unique id's used by the NBA Stats API. They are sometimes required by the other NBA nodes.</p>
+    <p>This particular node doesn't query the NBA API. Instead, it searches JSON files.</p>
+
+    <h3>References</h3>
+    <ul>
+        <li><a href='https://www.npmjs.com/package/nba'>NBA npm module</a> - further details regarding the API endpoints.</li>
+    </ul>
+</script>
+<!-- END Database -->
+
+<!-- START Player -->
+<script type="text/javascript">
+    function oneditprepare() {   
+        var node = this; 
+        addOptions = addOptions.bind(node);
+        setDefaultOption = setDefaultOption.bind(node);
+        
+
+        function addOption(param, select) {
+            var option = document.createElement("option");
+            option.text = param;
+            option.value = param;
+            select.add(option);
+        }
+
+        function addDefaultOption(param, select) {
+            var options_html = select.options; 
+            var options_arr = Array.from(options_html); 
+            var options = options_arr.map(opt => opt.value);
+            if (Array.from(options).indexOf(param) === -1) {
+                addOption(param, select);
+            }
+        }
+
+        function setDefaultOption(default_param, select, select_val, prop) {
+            if (select_val === "") {
+                select.value = default_param;
+                this[prop] = default_param; 
+            } else {
+                select.value = select_val; 
+                this[prop] = select_val;
+            }       
+        }
+
+        function camelToSnake(text) {
+            return text.replace(/(?:^|\.?)([A-Z])/g, function (x,y){return "_" + y.toLowerCase()}).replace(/^_/, "");
+        }
+
+        function addDynamicLoadOption(select, prop) {
+            var prop_snake = camelToSnake(prop);
+            var option = document.createElement("option");
+            option.text = "load from msg." + prop_snake;
+            option.value = "dynamic";
+            select.add(option);
+        }
+        
+        function addOptions(data, select, prop) {
+            var prop_snake = camelToSnake(prop);
+            var select_val = this[prop_snake];
+            var param = data.params.find(param => param.name === prop); 
+            param.values.forEach((param) => {
+                addOption(param, select, prop); 
+            })
+
+            addDefaultOption(param.default, select); 
+            setDefaultOption(param.default, select, select_val, prop_snake);      
+            addDynamicLoadOption(select, prop);
+        }
+
+
+
+        $.get("params", function(data, status){
+            addOptions(data, document.getElementById("node-input-season"), "Season");
+            addOptions(data, document.getElementById("node-input-measure_type"), "MeasureType")
+            addOptions(data, document.getElementById("node-input-season_type"), "SeasonType")
+        });
+        
+
+        function hideExtraActions(){
+            $("#node-action-season").hide();
+            $("#node-action-season_type").hide();
+            $("#node-action-measure_type").hide();
+        }
+
+        function showActions(){
+            var player_type = $("#node-input-player_type option:selected").val();
+            if (player_type === "shot chart") {
+                $("#node-action-season").show();
+                $("#node-action-season_type").show();
+            } else if (player_type === "splits") {
+                $("#node-action-season").show();
+                $("#node-action-season_type").show();
+                $("#node-action-measure_type").show();
+            } 
+        }
+
+        $("#node-input-player_type").change(function() {
+            hideExtraActions()
+            showActions()
+        });
+
+        hideExtraActions()
+        showActions()
+    }
+
+    RED.nodes.registerType('player',{
+        category: 'nba',
+        color: '#a6bbcf',
+        defaults: {
+            name: {value:""},
+            player_id: {value:""},
+            player_type: {value:"profile"},
+            season: {value:""},
+            season_type: {value: ""},
+            measure_type: {value: ""}
+        },
+        inputs:1,
+        outputs:1,
+        align: "left",
+        color:"#A2B2D0",
+        label: function() {
+            return this.name||"player " + this.player_type;
+        },
+        oneditprepare: oneditprepare
+    });
+</script>
+
+<script type="text/x-red" data-template-name="player">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> name</label>
+        <input type="text" id="node-input-name" placeholder="name">
+    </div>
+    <div class="form-row" id="node-action-player_type"> 
+        <label for="node-input-player_type"><i class="fa fa-wrench"></i> get</label>
+        <select type="text" id="node-input-player_type" style="display: inline-block; width: 250px; vertical-align: top;">
+            <option value="profile" outputs="1">profile</option>
+            <option value="stats" outputs="1">career stats</option>
+            <option value="shot chart" outputs="1">shot chart</option>
+            <option value="splits" outputs="1">splits</option>
+        </select>
+    </div>
+    <div class="form-row" id="node-action-season_type"> 
+        <label for="node-input-season_type"><i class="fa fa-wrench"></i> season type</label>
+        <select type="text" id="node-input-season_type" style="display: inline-block; width: 250px; vertical-align: top;">
+        </select>
+    </div>
+    <div class="form-row" id="node-action-measure_type"> 
+        <label for="node-input-measure_type"><i class="fa fa-wrench"></i> measure type</label>
+        <select type="text" id="node-input-measure_type" style="display: inline-block; width: 250px; vertical-align: top;">
+        </select>
+    </div>    
+    <div class="form-row" id="node-action-season">
+        <label for="node-input-season"><i class="icon-tag"></i> season</label>
+        <select type="text" id="node-input-season"  style="display: inline-block; width 250px; vertical-align: top;">
+        </select>
+    </div>
+    <div class="form-row" id="node-action-player_id">
+        <label for="node-input-player_id"><i class="icon-tag"></i> player_id</label>
+        <input type="text" id="node-input-player_id" placeholder="player_id">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="player">
+    <p>Get a player's profile, stats, or shot chart. Player id is required.</p>
+    
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>get <span class="property-type">selection</span></dt>
+        <dd> the type of data to be retrieved.</dd>
+        <dt>player id <span class="property-type">string | number</span></dt>
+        <dd> the player's unique id in the NBA Stats API</dd>
+        <dt>season type <span class="property-type">selection</span></dt>
+        <dd> the season segment</dd>
+        <dt>measure type <span class="property-type">selection</span></dt>
+        <dd> the measurement of the stats</dd>
+        <dt>season <span class="property-type">string</span></dt>
+        <dd> the NBA season (YYYY-YY)</dd>
+    </dl>
+
+    <h3>Outputs</h3>
+    <ol class="node-ports">
+        <li> 
+            <dl class="message-properties">
+            <dt>payload <span class="property-type">object | array</span></dt>
+            <dd> the data from the API call</dd>
+            </dl>
+        </li>
+        <li>Standard error
+            <dl class="message-properties">
+            <dt>payload <span class="property-type">string</span></dt>
+            <dd>the standard error of the command.</dd>
+            </dl>
+        </li>
+    </ol>
+
+    <h3>Getting a player id</h3>
+    <p>Use the database node to get a player's unique id.</p>
+    <h3>Season format</h3>
+    <p>NBA season format is required. Ex: 2018-19</p>
+    <h3>Dynamically populating fields</h3>
+    <p><b>Text fields</b> may be hardcoded or dynamically populated via mustache syntax relative to the incoming <code>msg</code> object.
+    For example, if the player id is located in <code>msg.payload.playerId</code>, then you can fill <code>{{payload.playerId}}</code> in the
+    <code> player id</code> field. </p>
+    <p><b>Dropdown fields</b> may be selected from the menu or dynamically populated via the specified property of the incoming msg object.
+    For example, if loading <code>measure type</code> dynamically, the dropdown menu designates <code>msg.measure_type</code> as the specified property.</p>
+
+        <h3>References</h3>
+    <ul>
+        <li><a href='https://www.npmjs.com/package/nba'>NBA npm module</a> - further details regarding the API endpoints</li>
+    </ul>
+</script>
+<!-- END Player -->
+
+<!-- START Team -->
+<script type="text/javascript">
+    function oneditprepare() {
+        var node = this; 
+        addOptions = addOptions.bind(node);
+        setDefaultOption = setDefaultOption.bind(node);
+        
+
+        function addOption(param, select) {
+            var option = document.createElement("option");
+            option.text = param;
+            option.value = param;
+            select.add(option);
+        }
+
+        function addDefaultOption(param, select) {
+            var options_html = select.options; 
+            var options_arr = Array.from(options_html); 
+            var options = options_arr.map(opt => opt.value);
+            if (Array.from(options).indexOf(param) === -1) {
+                addOption(param, select);
+            }
+        }
+
+        function setDefaultOption(default_param, select, select_val, prop) {
+            if (select_val === "") {
+                select.value = default_param;
+                this[prop] = default_param; 
+            } else {
+                select.value = select_val; 
+                this[prop] = select_val;
+            }       
+        }
+
+        function camelToSnake(text) {
+            return text.replace(/(?:^|\.?)([A-Z])/g, function (x,y){return "_" + y.toLowerCase()}).replace(/^_/, "");
+        }
+
+        function addDynamicLoadOption(select, prop) {
+            var prop_snake = camelToSnake(prop);
+            var option = document.createElement("option");
+            option.text = "load from msg." + prop_snake;
+            option.value = "dynamic";
+            select.add(option);
+        }
+        
+        function addOptions(data, select, prop) {
+            var prop_snake = camelToSnake(prop);
+            var select_val = this[prop_snake];
+            var param = data.params.find(param => param.name === prop); 
+            param.values.forEach((param) => {
+                addOption(param, select, prop); 
+            })
+
+            addDefaultOption(param.default, select); 
+            setDefaultOption(param.default, select, select_val, prop_snake);      
+            addDynamicLoadOption(select, prop);
+        }
+
+
+
+        $.get("params", function(data, status){
+            addOptions(data, document.getElementById("node-input-season"), "Season");
+            addOptions(data, document.getElementById("node-input-measure_type"), "MeasureType");
+            addOptions(data, document.getElementById("node-input-season_type"), "SeasonType");
+            addOptions(data, document.getElementById("node-input-per_mode"), "PerMode");
+        });
+
+        function hideExtraActions(){
+            $("#node-action-season").hide();
+            $("#node-action-season_type").hide();
+            $("#node-action-measure_type").hide();
+            $("#node-action-per_mode").hide();
+            $("#node-action-group_quantity").hide();
+            $("#node-action-player_team").hide();
+        }
+
+        function showActions(){
+            var team_type = $("#node-input-team_type option:selected").val();
+            if (team_type === "stats") {
+                $("#node-action-season").show();
+                $("#node-action-season_type").show();
+                $("#node-action-per_mode").show();
+            } else if (team_type === "roster") {
+                $("#node-action-season").show();
+            } else if (team_type === "lineups") {
+                $("#node-action-season").show();
+                $("#node-action-season_type").show();
+                $("#node-action-per_mode").show();
+                $("#node-action-measure_type").show();
+                $("#node-action-group_quantity").show();
+            } else if (team_type === "shooting") {
+                $("#node-action-player_team").show();
+                $("#node-action-season").show();
+                $("#node-action-season_type").show();
+                $("#node-action-per_mode").show();
+            } else if (team_type === "splits") {
+                $("#node-action-season").show();
+                $("#node-action-season_type").show();
+                $("#node-action-measure_type").show();
+            } else if (team_type === "shot chart") {
+                $("#node-action-season").show();
+                $("#node-action-season_type").show();
+            }
+        }
+
+        $("#node-input-team_type").change(function() {
+            hideExtraActions()
+            showActions()
+        });
+
+        hideExtraActions()
+        showActions()
+    }
+
+    RED.nodes.registerType('team',{
+        category: 'nba',
+        color: '#a6bbcf',
+        defaults: {
+            name: {value:""},
+            team_id: {value:""},
+            team_type: {value:"profile"},
+            season: {value:""},
+            season_type: {value: ""},
+            measure_type: {value: ""},
+            per_mode: {value: ""},
+            group_quantity: {value: "5"},
+            player_team: {value: "P"}
+        },
+        inputs:1,
+        outputs:1,
+        align: "left",
+        color:"#A2B2D0",
+        label: function() {
+            return this.name||"team " + this.team_type;
+        },
+        oneditprepare: oneditprepare
+    });
+</script>
+
+<script type="text/x-red" data-template-name="team">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> name</label>
+        <input type="text" id="node-input-name" placeholder="name">
+    </div>
+    <div class="form-row" id="node-action-team_type"> 
+        <label for="node-input-team_type"><i class="fa fa-wrench"></i> get</label>
+        <select type="text" id="node-input-team_type" style="display: inline-block; width: 250px; vertical-align: top;">
+            <option value="profile" outputs="1">profile</option>
+            <option value="stats" outputs="1">stats</option>
+            <option value="shooting" outputs="1">shooting</option>
+            <option value="splits" outputs="1">splits</option>
+            <option value="roster" outputs="1">roster</option>
+            <option value="lineups" outputs="1">lineups</option>
+            <option value="shot chart" outputs="1">shot chart</option>
+        </select>
+    </div>
+    <div class="form-row" id="node-action-season_type"> 
+        <label for="node-input-season_type"><i class="fa fa-wrench"></i> season type</label>
+        <select type="text" id="node-input-season_type" style="display: inline-block; width: 250px; vertical-align: top;">
+        </select>
+    </div>
+    <div class="form-row" id="node-action-season">
+        <label for="node-input-season"><i class="icon-tag"></i> season</label>
+        <select type="text" id="node-input-season" style="display: inline-block; width: 250px; vertical-align: top;">
+        </select>
+    </div>
+    <div class="form-row" id="node-action-measure_type"> 
+        <label for="node-input-measure_type"><i class="fa fa-wrench"></i> measure type</label>
+        <select type="text" id="node-input-measure_type" style="display: inline-block; width: 250px; vertical-align: top;">
+        </select>
+    </div>
+    <div class="form-row" id="node-action-player_team"> 
+        <label for="node-input-player_team"><i class="fa fa-wrench"></i> group by</label>
+        <select type="text" id="node-input-player_team" style="display: inline-block; width: 250px; vertical-align: top;">
+            <option value="P" outputs="1">player</option>
+            <option value="T" outputs="1">team</option>
+            <option value="dynamic" outputs="1">load from msg.player_team</option>
+        </select>
+    </div>
+    <div class="form-row" id="node-action-per_mode"> 
+        <label for="node-input-per_mode"><i class="fa fa-wrench"></i> per mode</label>
+        <select type="text" id="node-input-per_mode" style="display: inline-block; width: 250px; vertical-align: top;">
+        </select>
+    </div>
+    <div class="form-row" id="node-action-group_quantity"> 
+        <label for="node-input-group_quantity"><i class="fa fa-wrench"></i> group quantity</label>
+        <select type="text" id="node-input-group_quantity" style="display: inline-block; width: 250px; vertical-align: top;">
+            <option value="2" outputs="1">2</option>
+            <option value="3" outputs="1">3</option>
+            <option value="4" outputs="1">4</option>
+            <option value="5" outputs="1">5</option>
+            <option value="dynamic" outputs="1">load from msg.group_quantity</option>
+        </select>
+    </div>
+    <div class="form-row" id="node-action-team_id">
+        <label for="node-input-team_id"><i class="icon-tag"></i> team_id</label>
+        <input type="text" id="node-input-team_id" placeholder="team_id">
+    </div>      
+</script>
+
+<script type="text/x-red" data-help-name="team">
+    <p>Get a team's profile, stats, roster, lineups, or shot chart. Team id is required.</p>
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>get <span class="property-type">selection</span></dt>
+        <dd> the type of data to be retrieved</dd>
+        <dt>team id <span class="property-type">string</span></dt>
+        <dd> the team's unique id used by the NBA Stats API</dd>
+        <dt>get <span class="property-type">selection</span></dt>
+        <dd> the type of data to be retrieved</dd>  
+        <dt>season <span class="property-type">string</span></dt>
+        <dd> the NBA season (YYYY-YY)</dd>
+        <dt>season type <span class="property-type">selection</span></dt>
+        <dd> the season segment</dd>
+        <dt>group by <span class="property-type">selection</span></dt>
+        <dd> choose player or team</dd>
+        <dt>per mode <span class="property-type">selection</span></dt>
+        <dd> the measurement of the stats</dd>
+        <dt>measure type <span class="property-type">selection</span></dt>
+        <dd> the type of stats to be retrieved</dd>
+        <dt>group quantity <span class="property-type">selection</span></dt>
+        <dd> the number of players in the lineup</dd>
+    </dl>
+
+    <h3>Outputs</h3>
+    <ol class="node-ports">
+        <li> 
+            <dl class="message-properties">
+            <dt>payload <span class="property-type">object | array</span></dt>
+            <dd> details of the comment, submission, or PM.</dd>
+            </dl>
+        </li>
+        <li>Standard error
+            <dl class="message-properties">
+            <dt>payload <span class="property-type">string</span></dt>
+            <dd>the standard error of the command.</dd>
+            </dl>
+        </li>
+    </ol>
+
+    <h3>Getting a team id</h3>
+    <p>Use the database node to get a team's unique id.</p>
+
+
+    <h3>Season format</h3>
+    <p>NBA season format is required. Ex: 2018-19</p>
+
+    <h3>Dynamically populating fields</h3>
+    <p>Refer to the GitHub wiki for a full list of valid inputs</p>
+    <p><b>Text fields</b> may be hardcoded or dynamically populated via mustache syntax relative to the incoming <code>msg</code> object.
+    For example, if the season is located in <code>msg.payload.season</code>, then you can fill <code>{{payload.season}}</code> in the
+    <code> season</code> field. </p>
+    <p><b>Dropdown fields</b> may be selected from the menu or dynamically populated via the specified property of the incoming msg object.
+    For example, if loading <code>measure type</code> dynamically, the dropdown menu designates <code>msg.measure_type</code> as the specified property.</p>
+
+    <h3>References</h3>
+    <ul>
+        <li><a href='https://www.npmjs.com/package/nba'>NBA npm module</a> - further details regarding the API endpoints</li>
+    </ul>
+
+</script>
+<!-- END Team -->
+
+<!-- START League -->
+<script type="text/javascript">
+    function oneditprepare() {
+        var node = this; 
+        addOptions = addOptions.bind(node);
+        setDefaultOption = setDefaultOption.bind(node);
+        
+
+        function addOption(param, select) {
+            var option = document.createElement("option");
+            option.text = param;
+            option.value = param;
+            select.add(option);
+        }
+
+        function addDefaultOption(param, select) {
+            var options_html = select.options; 
+            var options_arr = Array.from(options_html); 
+            var options = options_arr.map(opt => opt.value);
+            if (Array.from(options).indexOf(param) === -1) {
+                addOption(param, select);
+            }
+        }
+
+        function setDefaultOption(default_param, select, select_val, prop) {
+            if (select_val === "") {
+                select.value = default_param;
+                this[prop] = default_param; 
+            } else {
+                select.value = select_val; 
+                this[prop] = select_val;
+            }       
+        }
+
+        function camelToSnake(text) {
+            return text.replace(/(?:^|\.?)([A-Z])/g, function (x,y){return "_" + y.toLowerCase()}).replace(/^_/, "");
+        }
+
+        function addDynamicLoadOption(select, prop) {
+            var prop_snake = camelToSnake(prop);
+            var option = document.createElement("option");
+            option.text = "load from msg." + prop_snake;
+            option.value = "dynamic";
+            select.add(option);
+        }
+        
+        function addOptions(data, select, prop) {
+            var prop_snake = camelToSnake(prop);
+            var select_val = this[prop_snake];
+            var param = data.params.find(param => param.name === prop); 
+            param.values.forEach((param) => {
+                addOption(param, select, prop); 
+            })
+
+            addDefaultOption(param.default, select); 
+            setDefaultOption(param.default, select, select_val, prop_snake);      
+            addDynamicLoadOption(select, prop);
+        }
+
+
+
+        $.get("params", function(data, status){
+            addOptions(data, document.getElementById("node-input-season"), "Season");
+            addOptions(data, document.getElementById("node-input-measure_type"), "MeasureType");
+            addOptions(data, document.getElementById("node-input-season_type"), "SeasonType");
+            addOptions(data, document.getElementById("node-input-per_mode"), "PerMode");
+            addOptions(data, document.getElementById("node-input-sorter"), "Sorter");
+            addOptions(data, document.getElementById("node-input-stat_category"), "StatCategory");
+            addOptions(data, document.getElementById("node-input-pt_measure_type"), "PtMeasureType");
+            addOptions(data, document.getElementById("node-input-ahead_behind"), "AheadBehind");
+            addOptions(data, document.getElementById("node-input-clutch_time"), "ClutchTime");
+        });
+
+        function hideExtraActions(){
+            $("#node-action-season").hide();
+            $("#node-action-season_type").hide();
+            $("#node-action-per_mode").hide();
+            $("#node-action-game_date").hide();
+            $("#node-action-stat_category").hide();
+            $("#node-action-sorter").hide();
+            $("#node-action-player_team").hide();
+            $("#node-action-measure_type").hide();
+            $("#node-action-pt_measure_type").hide();
+            $("#node-action-ahead_behind").hide();
+            $("#node-action-point_diff").hide();
+            $("#node-action-clutch_time").hide();
+            $("#node-action-group_quantity").hide();
+        }
+        
+
+        function showActions(){
+            var league_type = $("#node-input-league_type option:selected").val();
+            if (league_type === "leaders") {
+                $("#node-action-season_type").show();
+                $("#node-action-per_mode").show();
+                $("#node-action-stat_category").show();
+                $("#node-action-season").show();
+            } else if (league_type === "scoreboard") {
+                $("#node-action-game_date").show();
+            } else if (league_type === "standings") {
+                $("#node-action-season").show();
+                $("#node-action-season_type").show();   
+            } else if (league_type === "game log") {
+                $("#node-action-season").show();
+                $("#node-action-season_type").show();
+                $("#node-action-sorter").show();
+                $("#node-action-player_team").show();
+            } else if (league_type === "shooting") {
+                $("#node-action-player_team").show();
+                $("#node-action-season").show();
+                $("#node-action-season_type").show();
+                $("#node-action-per_mode").show();
+
+            } else if (league_type === "hustle") {
+                $("#node-action-player_team").show();
+                $("#node-action-season").show();
+                $("#node-action-season_type").show();
+                $("#node-action-per_mode").show();
+
+            } else if (league_type === "clutch") {
+                $("#node-action-player_team").show();
+                $("#node-action-season").show();
+                $("#node-action-season_type").show();
+                $("#node-action-per_mode").show();
+                $("#node-action-ahead_behind").show();
+                $("#node-action-point_diff").show();
+                $("#node-action-clutch_time").show();
+            } else if (league_type === "lineups") {
+                $("#node-action-season").show();
+                $("#node-action-season_type").show();
+                $("#node-action-per_mode").show();
+                $("#node-action-measure_type").show();
+                $("#node-action-group_quantity").show();
+            } else if (league_type === "player tracking") {
+                $("#node-action-season").show();
+                $("#node-action-season_type").show();
+                $("#node-action-per_mode").show();
+                $("#node-action-player_team").show();
+                $("#node-action-pt_measure_type").show();
+            }
+        }
+
+        $("#node-input-league_type").change(function() {
+            hideExtraActions()
+            showActions()
+        });
+
+        hideExtraActions()
+        showActions()
+    }
+
+    RED.nodes.registerType('league',{
+        category: 'nba',
+        color: '#a6bbcf',
+        defaults: {
+            name: {value:""},
+            league_type: {value:"scoreboard"},
+            season: {value:""},
+            season_type: {value: ""},
+            game_date: {value: ""},
+            per_mode: {value: ""},
+            stat_category: {value: ""},
+            sorter: {value: ""},
+            player_team: {value: "P"},
+            measure_type: {value: ""},
+            ahead_behind: {value: ""},
+            point_diff: {value: ""},
+            clutch_time: {value: ""},
+            group_quantity: {value: "5"},
+            pt_measure_type: {value: ""}
+        },
+        inputs:1,
+        outputs:1,
+        align: "left",
+        color:"#A2B2D0",
+        label: function() {
+            return this.name||"league " + this.league_type;
+        },
+        oneditprepare: oneditprepare
+      });
+</script>
+
+<script type="text/x-red" data-template-name="league">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> name</label>
+        <input type="text" id="node-input-name" placeholder="name">
+    </div>
+    <div class="form-row" id="node-action-league_type"> 
+        <label for="node-input-league_type"><i class="fa fa-wrench"></i> get</label>
+        <select type="text" id="node-input-league_type" style="display: inline-block; width: 250px; vertical-align: top;">
+            <option value="scoreboard" outputs="1">scoreboard</option>
+            <option value="leaders" outputs="1">leaders</option>
+            <option value="standings" outputs="1">standings</option>
+            <option value="game log" outputs="1">game log</option>
+            <option value="player tracking" outputs="1">player tracking</option>
+            <option value="shooting" outputs="1">shooting</option>
+            <option value="hustle" outputs="1">hustle</option>
+            <option value="clutch" outputs="1">clutch</option>
+            <option value="lineups" outputs="1">lineups</option>
+        </select>
+    </div>
+    <div class="form-row" id="node-action-season_type"> 
+        <label for="node-input-season_type"><i class="fa fa-wrench"></i> season type</label>
+        <select type="text" id="node-input-season_type" style="display: inline-block; width: 250px; vertical-align: top;">
+        </select>
+    </div>
+    <div class="form-row" id="node-action-season">
+        <label for="node-input-season"><i class="icon-tag"></i> season</label>
+        <select type="text" id="node-input-season" style="display: inline-block; width: 250px; vertical-align: top;">
+        </select>
+    </div>
+    <div class="form-row" id="node-action-player_team"> 
+        <label for="node-input-player_team"><i class="fa fa-wrench"></i> group by</label>
+        <select type="text" id="node-input-player_team" style="display: inline-block; width: 250px; vertical-align: top;">
+            <option value="P" outputs="1">player</option>
+            <option value="T" outputs="1">team</option>
+            <option value="dynamic" outputs="1">load from msg.player_team</option>
+        </select>
+    </div>    
+    <div class="form-row" id="node-action-per_mode"> 
+        <label for="node-input-per_mode"><i class="fa fa-wrench"></i> per mode</label>
+        <select type="text" id="node-input-per_mode" style="display: inline-block; width: 250px; vertical-align: top;">
+        </select>
+    </div>
+    <div class="form-row" id="node-action-measure_type"> 
+        <label for="node-input-measure_type"><i class="fa fa-wrench"></i> measure type</label>
+        <select type="text" id="node-input-measure_type" style="display: inline-block; width: 250px; vertical-align: top;">
+        </select>
+    </div>
+    <div class="form-row" id="node-action-pt_measure_type"> 
+        <label for="node-input-pt_measure_type"><i class="fa fa-wrench"></i> pt measure type</label>
+        <select type="text" id="node-input-pt_measure_type" style="display: inline-block; width: 250px; vertical-align: top;">
+        </select>
+    </div>
+    <div class="form-row" id="node-action-ahead_behind"> 
+        <label for="node-input-ahead_behind"><i class="fa fa-wrench"></i> ahead or behind</label>
+        <select type="text" id="node-input-ahead_behind" style="display: inline-block; width: 250px; vertical-align: top;">
+        </select>
+    </div>
+    <div class="form-row" id="node-action-stat_category"> 
+        <label for="node-input-stat_category"><i class="fa fa-wrench"></i> stat category</label>
+        <select type="text" id="node-input-stat_category" style="display: inline-block; width: 250px; vertical-align: top;">
+        </select>
+    </div>
+    <div class="form-row" id="node-action-sorter"> 
+        <label for="node-input-sorter"><i class="fa fa-wrench"></i> sorter</label>
+        <select type="text" id="node-input-sorter" style="display: inline-block; width: 250px; vertical-align: top;">
+        </select>
+    </div>
+    <div class="form-row" id="node-action-clutch_time"> 
+        <label for="node-input-clutch_time"><i class="fa fa-wrench"></i> clutch time</label>
+        <select type="text" id="node-input-clutch_time" style="display: inline-block; width: 250px; vertical-align: top;">
+        </select>
+    </div>
+    <div class="form-row" id="node-action-group_quantity"> 
+        <label for="node-input-group_quantity"><i class="fa fa-wrench"></i> group quantity</label>
+        <select type="text" id="node-input-group_quantity" style="display: inline-block; width: 250px; vertical-align: top;">
+            <option value="2" outputs="1">2</option>
+            <option value="3" outputs="1">3</option>
+            <option value="4" outputs="1">4</option>
+            <option value="5" outputs="1">5</option>
+            <option value="dynamic" outputs="1">load from msg.group_quantity</option>
+        </select>
+    </div>    
+    <div class="form-row" id="node-action-point_diff">
+        <label for="node-input-point_diff"><i class="icon-tag"></i> point diff</label>
+        <input type="text" id="node-input-point_diff" placeholder="5">
+    </div>
+    <div class="form-row" id="node-action-game_date">
+        <label for="node-input-game_date"><i class="icon-tag"></i> game date</label>
+        <input type="text" id="node-input-game_date" placeholder="YYYY-MM-DD">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="league">
+    <p>Get leaguewide stats, standings, leaders, game logs, scores, and lineups. No id required.</p>
+
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>get <span class="property-type">selection</span></dt>
+        <dd> the data to be retrieved</dd>
+        <dt>season type <span class="property-type">selection</span></dt>
+        <dd> the season segment</dd>
+        <dt>per mode <span class="property-type">selection</span></dt>
+        <dd> the measurement of the stats</dd>
+        <dt>per mode <span class="property-type">selection</span></dt>
+        <dd> the measurement of the stats</dd>
+        <dt>stat<span class="property-type">selection</span></dt>
+        <dd> choose the stat to filter by</dd>
+        <dt>group by<span class="property-type">selection</span></dt>
+        <dd> choose player or team</dd>
+        <dt>ahead or behind<span class="property-type">selection</span></dt>
+        <dd> choose the clutch situation</dd>
+        <dt>clutch time<span class="property-type">selection</span></dt>
+        <dd> choose the remaining minutes</dd>
+        <dt>point diff<span class="property-type">number</span></dt>
+        <dd> the point differential</dd>
+        <dt>measure type<span class="property-type">selection</span></dt>
+        <dd> the type of stats to be retrieved</dd>
+        <dt>group quantity<span class="property-type">selection</span></dt>
+        <dd> the number of players in the lineups</dd>
+        <dt>season<span class="property-type">string</span></dt>
+        <dd> the NBA season (YYYY-YY)</dd>
+    </dl>
+
+    <h3>Outputs</h3>
+    <ol class="node-ports">
+        <li> 
+            <dl class="message-properties">
+            <dt>payload <span class="property-type">object | array</span></dt>
+            <dd> details of the comment, submission, or PM.</dd>
+            </dl>
+        </li>
+        <li>Standard error
+            <dl class="message-properties">
+            <dt>payload <span class="property-type">string</span></dt>
+            <dd>the standard error of the command.</dd>
+            </dl>
+        </li>
+    </ol>
+
+    <h3>Season format</h3>
+    <p>NBA season format is required. Ex: 2018-19</p>
+
+    <h3>Dynamically populating fields</h3>
+    <p>Refer to the GitHub wiki for a full list of valid inputs</p>
+    <p><b>Text fields</b> may be hardcoded or dynamically populated via mustache syntax relative to the incoming <code>msg</code> object.
+    For example, if the season is located in <code>msg.payload.season</code>, then you can fill <code>{{payload.season}}</code> in the
+    <code> season</code> field. </p>
+    <p><b>Dropdown fields</b> may be selected from the menu or dynamically populated via the specified property of the incoming msg object.
+    For example, if loading <code>measure type</code> dynamically, the dropdown menu designates <code>msg.measure_type</code> as the specified property.</p>
+
+    <h3>References</h3>
+    <ul>
+        <li><a href='https://www.npmjs.com/package/nba'>NBA npm module</a> - further details regarding the API endpoints</li>
+    </ul>
+</script>
+<!-- END League -->
+
+<!-- START Game -->
+<script type="text/javascript">
+    RED.nodes.registerType('game',{
+        category: 'nba',
+        color: '#a6bbcf',
+        defaults: {
+            name: {value:""},
+            game_id: {value:""},
+            game_type: {value:"box score"}
+        },
+        inputs:1,
+        outputs:1,
+        align: "left",
+        color:"#A2B2D0",
+        label: function() {
+            return this.name||"game " + this.game_type;
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="game">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> name</label>
+        <input type="text" id="node-input-name" placeholder="name">
+    </div>
+    <div class="form-row" id="node-action-game_type"> 
+        <label for="node-input-game_type"><i class="fa fa-wrench"></i> type</label>
+        <select type="text" id="node-input-game_type" style="display: inline-block; width: 250px; vertical-align: top;">
+            <option value="box score" outputs="1">box score</option>
+            <option value="play-by-play" outputs="1">play-by-play</option>
+            <option value="shot chart" outputs="1">shot chart</option>
+        </select>
+    </div>
+    <div class="form-row" id="node-action-game_id">
+        <label for="node-input-game_id"><i class="icon-tag"></i> game_id</label>
+        <input type="text" id="node-input-game_id" placeholder="game_id">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="game">
+    <p>Get a game's boxscore, play-by-play, or shot chart. Game id is required.</p>
+
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>get <span class="property-type">selection</span></dt>
+        <dd> the type of data to be retrieved</dd>
+        <dt>game id <span class="property-type">string</span></dt>
+        <dd> the game's id used by the NBA stats API</dd>
+    </dl>
+
+    <h3>Outputs</h3>
+    <ol class="node-ports">
+        <li> 
+            <dl class="message-properties">
+                <dt>payload <span class="property-type">object | array</span></dt>
+                <dd> details of the comment, submission, or PM.</dd>
+            </dl>
+        </li>
+        <li>Standard error
+            <dl class="message-properties">
+            <dt>payload <span class="property-type">string</span></dt>
+            <dd>the standard error of the command.</dd>
+            </dl>
+        </li>
+    </ol>
+
+    <h3>Getting a game id</h3>
+    <p>Use the league node to get the unique id's of all the games being played on a given date.</p>
+
+    <h3>Dynamically populating fields</h3>
+    <p><b>Text fields</b> may be hardcoded or dynamically populated via mustache syntax relative to the incoming <code>msg</code> object.
+    For example, if the game id is located in <code>msg.payload.gameId</code>, then you can fill <code>{{payload.gameId}}</code> in the
+    <code> game id</code> field. </p>
+
+</script>
+<!-- END Game -->
+
+<!-- START Update
+<script type="text/javascript">
+    RED.nodes.registerType('update',{
+        category: 'nba',
+        color: '#a6bbcf',
+        defaults: {
+            name: {value:""}
+        },
+        inputs:1,
+        outputs:1,
+        align: "left",
+        color:"#A2B2D0",
+        label: function() {
+            return this.name || "update database";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="update">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> name</label>
+        <input type="text" id="node-input-name" placeholder="name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="update">
+    <p>Get the most up-to-date player information from the NBA Stats API.</p>
+    
+    <h3>Outputs</h3>
+    <ol class="node-ports">
+        <li> 
+            <dl class="message-properties">
+            <dt>payload <span class="property-type">object | array</span></dt>
+            <dd> </dd>
+            </dl>
+        </li>
+        <li>Standard error
+            <dl class="message-properties">
+            <dt>payload <span class="property-type">string</span></dt>
+            <dd>the standard error of the command.</dd>
+            </dl>
+        </li>
+    </ol>
+
+    <h3>Details</h3>
+    <p>Use this node to get access to the players and teams in the NBA, as well as their unique id's.</p>
+    <p>The id's refer to the unique id's used by the NBA Stats API. They are sometimes required by the other NBA nodes.</p>
+    <p>This particular node doesn't query the NBA API. Instead, it searches JSON files.</p>
+
+    <h3>References</h3>
+    <ul>
+        <li><a href='https://www.npmjs.com/package/nba'>NBA npm module</a> - further details regarding the API endpoints.</li>
+    </ul>
+</script>
+END Update -->
