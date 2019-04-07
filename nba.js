@@ -55,6 +55,8 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this,n);
 		var node = this;
 
+		console.log("TEST LINK");
+
 		node.status({});
 		node.on('input', function(msg) {
 			node.status({fill:"blue",shape:"dot",text:"loading"});
