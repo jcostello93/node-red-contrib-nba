@@ -80,7 +80,8 @@ describe('League node: ', function () {
             msg.payload.should.have.property("resource", "leagueleaders");
             msg.payload.should.have.property("parameters");
             msg.payload.should.have.property("resultSet");
-            msg.payload.resultSet[0].should.have.property("PLAYER_ID");
+            msg.payload.should.have.property("cleanedData");
+            msg.payload.cleanedData[0].should.have.property("PLAYER_ID");
             done();
           });
           n1.receive({ payload: "" });
@@ -100,7 +101,8 @@ describe('League node: ', function () {
             msg.payload.should.have.property("resource", "leagueleaders");
             msg.payload.should.have.property("parameters");
             msg.payload.should.have.property("resultSet");
-            msg.payload.resultSet[0].should.have.property("PLAYER_ID");
+            msg.payload.should.have.property("cleanedData");
+            msg.payload.cleanedData[0].should.have.property("PLAYER_ID");
             done();
           });
           n1.receive({ payload: "", season_type: "Regular Season" });
@@ -120,7 +122,8 @@ describe('League node: ', function () {
             msg.payload.should.have.property("resource", "leagueleaders");
             msg.payload.should.have.property("parameters");
             msg.payload.should.have.property("resultSet");
-            msg.payload.resultSet[0].should.have.property("PLAYER_ID");
+            msg.payload.should.have.property("cleanedData");
+            msg.payload.cleanedData[0].should.have.property("PLAYER_ID");
             done();
           });
           n1.receive({ payload: "", per_mode: "PerGame" });
@@ -140,7 +143,8 @@ describe('League node: ', function () {
             msg.payload.should.have.property("resource", "leagueleaders");
             msg.payload.should.have.property("parameters");
             msg.payload.should.have.property("resultSet");
-            msg.payload.resultSet[0].should.have.property("PLAYER_ID");
+            msg.payload.should.have.property("cleanedData");
+            msg.payload.cleanedData[0].should.have.property("PLAYER_ID");
             done();
           });
           n1.receive({ payload: "", stat_category: "PTS" });
@@ -160,7 +164,8 @@ describe('League node: ', function () {
             msg.payload.should.have.property("resource", "leagueleaders");
             msg.payload.should.have.property("parameters");
             msg.payload.should.have.property("resultSet");
-            msg.payload.resultSet[0].should.have.property("PLAYER_ID");
+            msg.payload.should.have.property("cleanedData");
+            msg.payload.cleanedData[0].should.have.property("PLAYER_ID");
             done();
           });
           n1.receive({ payload: "", season: "2018-19" });
@@ -179,33 +184,37 @@ describe('League node: ', function () {
             msg.should.have.property("payload");
             msg.payload.should.have.property("resource", "leaguestandings");
             msg.payload.should.have.property("parameters");
-            msg.payload.should.have.property("resultSet");
-            msg.payload.resultSet[0].should.have.property("TeamID");
+            msg.payload.should.have.property("resultSets");
+            msg.payload.resultSets[0].should.have.property("name", "Standings");
+            msg.payload.should.have.property("cleanedData");
+            msg.payload.cleanedData[0].should.have.property("TeamID");
             done();
           });
           n1.receive({ payload: "2018-19" });
         });
       });
 
-      it('league game log by player', function (done) {
-        var flow = [
-          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "game log", season_type: "Regular Season", season: "2018-19", sorter: "PTS", player_team: "P"},
-          { id: "n2", type: "helper" }
-        ];
-        helper.load(nbaNode, flow, function () {
-          var n2 = helper.getNode("n2");
-          var n1 = helper.getNode("n1");
-          n2.on("input", function (msg) {
-            msg.should.have.property("payload");
-            msg.payload.should.have.property("resource", "leaguegamelog");
-            msg.payload.should.have.property("parameters");
-            msg.payload.should.have.property("resultSet");
-            msg.payload.resultSet[0].should.have.property("PLAYER_ID");
-            done();
-          });
-          n1.receive({ payload: "2018-19" });
+    it('league game log by player', function (done) {
+      var flow = [
+        { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "game log", season_type: "Regular Season", season: "2018-19", sorter: "PTS", player_team: "P"},
+        { id: "n2", type: "helper" }
+      ];
+      helper.load(nbaNode, flow, function () {
+        var n2 = helper.getNode("n2");
+        var n1 = helper.getNode("n1");
+        n2.on("input", function (msg) {
+          msg.should.have.property("payload");
+          msg.payload.should.have.property("resource", "leaguegamelog");
+          msg.payload.should.have.property("parameters");
+          msg.payload.should.have.property("resultSets");
+          msg.payload.resultSets[0].should.have.property("name", "LeagueGameLog");
+          msg.payload.should.have.property("cleanedData");
+          msg.payload.cleanedData[0].should.have.property("PLAYER_ID");
+          done();
         });
+        n1.receive({ payload: "2018-19" });
       });
+    });
 
     it('(node) sorter load from msg.sorter', function (done) {
         var flow = [
@@ -219,31 +228,13 @@ describe('League node: ', function () {
             msg.should.have.property("payload");
             msg.payload.should.have.property("resource", "leaguegamelog");
             msg.payload.should.have.property("parameters");
-            msg.payload.should.have.property("resultSet");
-            msg.payload.resultSet[0].should.have.property("PLAYER_ID");
+            msg.payload.should.have.property("resultSets");
+            msg.payload.resultSets[0].should.have.property("name", "LeagueGameLog");
+            msg.payload.should.have.property("cleanedData");
+            msg.payload.cleanedData[0].should.have.property("PLAYER_ID");
             done();
           });
           n1.receive({ payload: "2018-19", sorter: "PTS" });
-        });
-      });
-
-    it('(node) player_team load from msg.player_team', function (done) {
-        var flow = [
-          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "game log", season_type: "Regular Season", season: "2018-19", sorter: "PTS", player_team: "dynamic"},
-          { id: "n2", type: "helper" }
-        ];
-        helper.load(nbaNode, flow, function () {
-          var n2 = helper.getNode("n2");
-          var n1 = helper.getNode("n1");
-          n2.on("input", function (msg) {
-            msg.should.have.property("payload");
-            msg.payload.should.have.property("resource", "leaguegamelog");
-            msg.payload.should.have.property("parameters");
-            msg.payload.should.have.property("resultSet");
-            msg.payload.resultSet[0].should.have.property("PLAYER_ID");
-            done();
-          });
-          n1.receive({ payload: "2018-19", player_team: "P" });
         });
       });
 
@@ -259,8 +250,10 @@ describe('League node: ', function () {
             msg.should.have.property("payload");
             msg.payload.should.have.property("resource", "leaguegamelog");
             msg.payload.should.have.property("parameters");
-            msg.payload.should.have.property("resultSet");
-            msg.payload.resultSet[0].should.have.property("TEAM_ID");
+            msg.payload.should.have.property("resultSets");
+            msg.payload.resultSets[0].should.have.property("name", "LeagueGameLog");
+            msg.payload.should.have.property("cleanedData");
+            msg.payload.cleanedData[0].should.have.property("TEAM_ID");
             done();
           });
           n1.receive({ payload: "2018-19" });
@@ -277,7 +270,8 @@ describe('League node: ', function () {
           var n1 = helper.getNode("n1");
           n2.on("input", function (msg) {
             msg.should.have.property("payload");
-            msg.payload[0].should.have.property("playerId");
+            msg.payload.should.have.property("leagueDashPtStats");
+            msg.payload.leagueDashPtStats[0].should.have.property("playerId");
             done();
           });
           n1.receive({ payload: "2018-19"});
@@ -293,8 +287,9 @@ describe('League node: ', function () {
           var n2 = helper.getNode("n2");
           var n1 = helper.getNode("n1");
           n2.on("input", function (msg) {
-                msg.should.have.property("payload");
-                msg.payload[0].should.have.property("teamId");
+            msg.should.have.property("payload");
+            msg.payload.should.have.property("leagueDashPtStats");
+            msg.payload.leagueDashPtStats[0].should.have.property("teamId");
             done();
           });
           n1.receive({ payload: "2018-19"});
@@ -311,7 +306,8 @@ describe('League node: ', function () {
           var n1 = helper.getNode("n1");
           n2.on("input", function (msg) {
             msg.should.have.property("payload");
-            msg.payload[0].should.have.property("teamId");
+            msg.payload.should.have.property("leagueDashPtStats");
+            msg.payload.leagueDashPtStats[0].should.have.property("teamId");
             done();
           });
           n1.receive({ payload: "2018-19", pt_measure_type: "CatchShoot"});
@@ -328,10 +324,29 @@ describe('League node: ', function () {
           var n1 = helper.getNode("n1");
           n2.on("input", function (msg) {
             msg.should.have.property("payload");
-            msg.payload[0].should.have.property("playerId");
+            msg.payload.should.have.property("leagueDashPTShots");
+            msg.payload.leagueDashPTShots[0].should.have.property("playerId");
             done();
           });
           n1.receive({ payload: "2018-19"});
+        });
+      });
+
+      it('(node) player_team load from msg.player_team', function (done) {
+        var flow = [
+          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "shooting", season_type: "Regular Season", per_mode: "PerGame",  season: "2018-19",  player_team: "dynamic"},
+          { id: "n2", type: "helper" }
+        ];
+        helper.load(nbaNode, flow, function () {
+          var n2 = helper.getNode("n2");
+          var n1 = helper.getNode("n1");
+          n2.on("input", function (msg) {
+            msg.should.have.property("payload");
+            msg.payload.should.have.property("leagueDashPTShots");
+            msg.payload.leagueDashPTShots[0].should.have.property("playerId");
+            done();
+          });
+          n1.receive({ payload: "2018-19", player_team: "P"});
         });
       });
 
@@ -345,7 +360,8 @@ describe('League node: ', function () {
           var n1 = helper.getNode("n1");
           n2.on("input", function (msg) {
             msg.should.have.property("payload");
-            msg.payload[0].should.have.property("teamId");
+            msg.payload.should.have.property("leagueDashPTShots");
+            msg.payload.leagueDashPTShots[0].should.have.property("teamId");
             done();
           });
           n1.receive({ payload: "2018-19"});
@@ -363,32 +379,36 @@ describe('League node: ', function () {
           n2.on("input", function (msg) {
             msg.payload.should.have.property("resource", "leaguehustlestatsplayer");
             msg.payload.should.have.property("parameters");
-            msg.payload.should.have.property("resultSet");
-            msg.payload.resultSet[0].should.have.property("PLAYER_ID");
+            msg.payload.should.have.property("resultSets");
+            msg.payload.resultSets[0].should.have.property("name", "HustleStatsPlayer");
+            msg.payload.should.have.property("cleanedData");
+            msg.payload.cleanedData[0].should.have.property("PLAYER_ID");
             done();
           });
           n1.receive({ payload: "2018-19"});
         });
       });
 
-      it('league hustle by team', function (done) {
-        var flow = [
-          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "hustle", season_type: "Regular Season", per_mode: "PerGame",  season: "2018-19",  player_team: "T"},
-          { id: "n2", type: "helper" }
-        ];
-        helper.load(nbaNode, flow, function () {
-          var n2 = helper.getNode("n2");
-          var n1 = helper.getNode("n1");
-          n2.on("input", function (msg) {
-            msg.payload.should.have.property("resource", "leaguehustlestatsteam");
-            msg.payload.should.have.property("parameters");
-            msg.payload.should.have.property("resultSet");
-            msg.payload.resultSet[0].should.have.property("TEAM_ID");
-            done();
-          });
-          n1.receive({ payload: "2018-19"});
+    it('league hustle by team', function (done) {
+      var flow = [
+        { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "hustle", season_type: "Regular Season", per_mode: "PerGame",  season: "2018-19",  player_team: "T"},
+        { id: "n2", type: "helper" }
+      ];
+      helper.load(nbaNode, flow, function () {
+        var n2 = helper.getNode("n2");
+        var n1 = helper.getNode("n1");
+        n2.on("input", function (msg) {
+          msg.payload.should.have.property("resource", "leaguehustlestatsteam");
+          msg.payload.should.have.property("parameters");
+          msg.payload.should.have.property("resultSets");
+          msg.payload.resultSets[0].should.have.property("name", "HustleStatsTeam");
+          msg.payload.should.have.property("cleanedData");
+          msg.payload.cleanedData[0].should.have.property("TEAM_ID");
+          done();
         });
+        n1.receive({ payload: "2018-19"});
       });
+    });
 
     it('league clutch by player', function (done) {
         var flow = [
@@ -400,7 +420,8 @@ describe('League node: ', function () {
           var n1 = helper.getNode("n1");
           n2.on("input", function (msg) {
             msg.should.have.property("payload");
-            msg.payload[0].should.have.property("playerId");
+            msg.payload.should.have.property("leagueDashPlayerClutch");
+            msg.payload.leagueDashPlayerClutch[0].should.have.property("playerId");
             done();
           });
           n1.receive({ payload: "2018-19"});
@@ -417,7 +438,8 @@ describe('League node: ', function () {
           var n1 = helper.getNode("n1");
           n2.on("input", function (msg) {
             msg.should.have.property("payload");
-            msg.payload[0].should.have.property("teamId");
+            msg.payload.should.have.property("leagueDashTeamClutch");
+            msg.payload.leagueDashTeamClutch[0].should.have.property("teamId");
             done();
           });
           n1.receive({ payload: "2018-19"});
@@ -434,7 +456,8 @@ describe('League node: ', function () {
           var n1 = helper.getNode("n1");
           n2.on("input", function (msg) {
             msg.should.have.property("payload");
-            msg.payload[0].should.have.property("playerId");
+            msg.payload.should.have.property("leagueDashPlayerClutch");
+            msg.payload.leagueDashPlayerClutch[0].should.have.property("teamId");
             done();
           });
           n1.receive({ payload: "2018-19", ahead_behind: "Ahead or Behind"});
@@ -451,7 +474,8 @@ describe('League node: ', function () {
           var n1 = helper.getNode("n1");
           n2.on("input", function (msg) {
             msg.should.have.property("payload");
-            msg.payload[0].should.have.property("playerId");
+            msg.payload.should.have.property("leagueDashPlayerClutch");
+            msg.payload.leagueDashPlayerClutch[0].should.have.property("playerId");
             done();
           });
           n1.receive({ payload: "2018-19", clutch_time: "Last 5 Minutes"});
@@ -468,7 +492,8 @@ describe('League node: ', function () {
           var n1 = helper.getNode("n1");
           n2.on("input", function (msg) {
             msg.should.have.property("payload");
-            msg.payload[0].should.have.property("playerId");
+            msg.payload.should.have.property("leagueDashPlayerClutch");
+            msg.payload.leagueDashPlayerClutch[0].should.have.property("playerId");
             done();
           });
           n1.receive({ payload: "5"});
