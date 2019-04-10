@@ -8,17 +8,17 @@ module.exports = function(RED) {
 
 	// In order of priority: 1. HTML text OR mustache syntax, 2. msg.msgProp 
 	function parseField(msg, nodeProp, msgProp) {
-			var field = null;
-			var isTemplatedField = (nodeProp||"").indexOf("{{") != -1
-			if (isTemplatedField) {
-				field = mustache.render(nodeProp,msg);
-			}
-			else {
-				field = (nodeProp === "dynamic") ? msg[msgProp] : nodeProp;
-			}
-	
-			return field;
+		var field = null;
+		var isTemplatedField = (nodeProp||"").indexOf("{{") != -1
+		if (isTemplatedField) {
+			field = mustache.render(nodeProp,msg);
 		}
+		else {
+			field = (nodeProp === "dynamic") ? msg[msgProp] : nodeProp;
+		}
+
+		return field;
+	}
 
 	function playerObjFromID(player_id) {
 		return NBA.players.find(player => player.playerId === player_id);
@@ -49,6 +49,16 @@ module.exports = function(RED) {
 		}
 
 		return result; 
+	}
+
+	function cleanData(response) {
+		if (response.resultSet) {
+			response.cleanedData = convertData(response.resultSet);
+		} else if (response.resultSets) {
+			response.cleanedData = convertData(response.resultSets[0]);
+		}
+
+		return response;
 	}
 
 	function DatabaseNode(n) {
@@ -113,7 +123,14 @@ module.exports = function(RED) {
 
 	function PlayerNode(n) {
 		RED.nodes.createNode(this,n);
-        var node = this;
+		var node = this;
+		
+		var method_dict = {
+			"profile": NBA.stats.playerInfo,
+			"stats": NBA.stats.playerProfile,
+			"shot chart": NBA.stats.shots,
+			"splits": NBA.stats.playerSplits
+		}
 
 		node.status({});
 		node.on('input', function(msg) {
@@ -121,6 +138,7 @@ module.exports = function(RED) {
 			var player_obj = playerObjFromID(player_id);
 			var last_name;
  
+			// Send error and bail if player isn't found
 			if (player_obj) {
 				last_name = player_obj.lastName;
 			} else {
@@ -135,35 +153,16 @@ module.exports = function(RED) {
 			var season_type = parseField(msg, n.season_type, "season_type");
 			var measure_type = parseField(msg, n.measure_type, "measure_type");
 
-			if (player_type === "profile") {				
-				NBA.stats.playerInfo({PlayerID: player_id})
-					.then(response => { sendMsg({ "commonPlayerInfo": response.commonPlayerInfo[0], "playerHeadlineStats": response.playerHeadlineStats[0] }) })
-					.catch(error => {  sendError(error) })
-			} else if (player_type === "stats") {
-				NBA.stats.playerProfile({PlayerID: player_id})
-					.then(response => { 
-						// Convert array with one item to an object 
-						response.careerTotalsRegularSeason = response.careerTotalsRegularSeason[0];
-						response.careerTotalsPostSeason = response.careerTotalsPostSeason[0];
-						response.careerTotalsAllStarSeason = response.careerTotalsAllStarSeason[0];
-						response.careerTotalsCollegeSeason = response.careerTotalsCollegeSeason[0];
-						response.careerTotalsPreseason = response.careerTotalsPreseason[0];
-						response.nextGame = response.nextGame[0]; 
-						sendMsg(response) 
-					})
-					.catch(error => { 	sendError(error)})
-			} else if (player_type === "shot chart") {
-				NBA.stats.shots({PlayerID: player_id, Season: season, SeasonType: season_type})
-					.then(response => { sendMsg(response) })
-					.catch(error => { sendError(error) })
-			} else if (player_type === "splits") {
-				NBA.stats.playerSplits({PlayerID: player_id, Season: season, SeasonType: season_type, MeasureType: measure_type})
-					.then(response => { 
-						response.overallPlayerDashboard = response.overallPlayerDashboard[0];
-						sendMsg(response) 
-					})
-					.catch(error => { sendError(error) 	})
+			var params_dict = {
+				"profile": {PlayerID: player_id},
+				"stats": {PlayerID: player_id},
+				"shot chart": {PlayerID: player_id, Season: season, SeasonType: season_type},
+				"splits": {PlayerID: player_id, Season: season, SeasonType: season_type, MeasureType: measure_type}
 			}
+
+			method_dict[player_type](params_dict[player_type])
+				.then (response => { sendMsg(response) })
+				.catch (error => { sendError(error) })
 
 			function sendMsg(payload) {
 				msg.payload = payload;
@@ -182,7 +181,18 @@ module.exports = function(RED) {
 	
 	function TeamNode(n) {
 		RED.nodes.createNode(this,n);
-        var node = this;
+		var node = this;
+		
+		var method_dict = {
+			"profile":NBA.stats.teamInfoCommon,
+			"stats": NBA.stats.teamStats,
+			"roster": NBA.stats.commonTeamRoster,
+			"lineups": NBA.stats.lineups,
+			"player_shooting": NBA.stats.playerShooting,
+			"team_shooting": NBA.stats.teamShooting,
+			"splits": NBA.stats.teamSplits,
+			"shot chart": NBA.stats.shots
+		}
 
 		node.status({});
 		node.on('input', function(msg) {
@@ -198,44 +208,24 @@ module.exports = function(RED) {
 			var season_type = parseField(msg, n.season_type, "season_type");
 			node.status({fill:"blue",shape:"dot",text: team_name});
 
-			if (team_type === "profile") {				
-				NBA.stats.teamInfoCommon({TeamID: team_id})
-					.then(response => { sendMsg({ "teamInfoCommon": response.teamInfoCommon[0], "teamSeasonRanks": response.teamSeasonRanks[0] }) })
-					.catch(error => {  sendError(error) })
-			} else if (team_type === "stats") {
-				NBA.stats.teamStats({TeamID: team_id, Season: season, SeasonType: season_type, Outcome: "L"})
-					.then(response => { sendMsg(response[0])})
-					.catch(error => { 	sendError(error)})
-			} else if (team_type === "roster") {
-				NBA.stats.commonTeamRoster({TeamID: team_id, Season: season})
-					.then(response => { sendMsg(response) })
-					.catch(error => { 	sendError(error)})
-			} else if (team_type === "lineups") {
-				NBA.stats.lineups({TeamID: team_id, Season: season, SeasonType: season_type, PerMode: per_mode, MeasureType: measure_type, GroupQuantity: group_quantity})
-					.then(response => { sendMsg(response); })
-					.catch(error => { sendError(error) })
-			} else if (team_type === "shooting") {
-				if (p_or_t === "P") {
-					NBA.stats.playerShooting({TeamID: team_id, Season: season, SeasonType: season_type, PerMode: per_mode})
-						.then(response => { sendMsg(response.leagueDashPTShots); })
-						.catch(error => { sendError(error) })
-				} else if (p_or_t === "T") {
-					NBA.stats.teamShooting({TeamID: team_id, Season: season, SeasonType: season_type, PerMode: per_mode})
-						.then(response => { sendMsg(response.leagueDashPTShots[0]); })
-						.catch(error => { sendError(error) })
-				}
-			} else if (team_type === "splits") {
-				NBA.stats.teamSplits({TeamID: team_id, Season: season, SeasonType: season_type, MeasureType: measure_type})
-					.then(response => { 
-						response.overallTeamDashboard = response.overallTeamDashboard[0]; 
-						sendMsg(response);
-					})
-					.catch(error => { sendError(error) 	})
-			} else if (team_type === "shot chart") {
-				NBA.stats.shots({TeamID: team_id, Season: season, SeasonType: season_type})
-					.then(response => { sendMsg(response) })
-					.catch(error => { sendError(error) })
+			if (team_type === "shooting") {
+				team_type = (p_or_t === "P") ? "player_shooting" : "team_shooting";
 			}
+
+			var params_dict = {
+				"profile": {TeamID: team_id},
+				"stats": {TeamID: team_id, Season: season, SeasonType: season_type},
+				"roster": {TeamID: team_id, Season: season},
+				"lineups": {TeamID: team_id, Season: season, SeasonType: season_type, PerMode: per_mode, MeasureType: measure_type, GroupQuantity: group_quantity},
+				"player_shooting": {TeamID: team_id, Season: season, SeasonType: season_type, PerMode: per_mode},
+				"team_shooting": {TeamID: team_id, Season: season, SeasonType: season_type, PerMode: per_mode},
+				"splits": {TeamID: team_id, Season: season, SeasonType: season_type, MeasureType: measure_type},
+				"shot chart": {TeamID: team_id, Season: season, SeasonType: season_type}
+			}
+
+			method_dict[team_type](params_dict[team_type])
+				.then (response => { sendMsg(response) })
+				.catch (error => { sendError(error) })		
 
 			function sendMsg(payload) {
 				msg.payload = payload;
@@ -247,7 +237,6 @@ module.exports = function(RED) {
 				node.error(error, msg);
 				node.status({fill:"red",shape:"dot",text:"error"});
 			}
-
 		});        
 	}
 	RED.nodes.registerType("team",TeamNode);
@@ -255,6 +244,21 @@ module.exports = function(RED) {
 	function LeagueNode(n) {
 		RED.nodes.createNode(this,n);
 		var node = this;
+
+		var method_dict = {
+			"scoreboard": NBA.stats.scoreboard,
+			"leaders": NBA.stats.leagueLeaders,
+			"standings": NBA.stats.leagueStandings,
+			"game log": NBA.stats.leagueGameLog,
+			"player tracking": NBA.stats.playerTracking,
+			"player_shooting": NBA.stats.playerShooting,
+			"team_shooting": NBA.stats.teamShooting,
+			"player_hustle": NBA.stats.playerHustle,
+			"team_hustle": NBA.stats.teamHustle,
+			"player_clutch": NBA.stats.playerClutch,
+			"team_clutch": NBA.stats.teamClutch,
+			"lineups": NBA.stats.lineups
+		}
 
 		node.status({});
 		node.on('input', function(msg) {
@@ -273,91 +277,43 @@ module.exports = function(RED) {
 			var clutch_time = parseField(msg, n.clutch_time, "clutch_time");
 			var measure_type = parseField(msg, n.measure_type, "measure_type");
 			var pt_measure_type = parseField(msg, n.pt_measure_type, "pt_measure_type");
-			var group_quantity = parseField(msg, n.group_quantity, "group_quantity")
+			var group_quantity = parseField(msg, n.group_quantity, "group_quantity");
 
-
-			if (league_type === "scoreboard") {
-				NBA.stats.scoreboard({gameDate: game_date})
-					.then(response => { sendMsg(response, game_date); })
-					.catch(error => { sendError(error) })	
-			} else if (league_type === "leaders") {
-				NBA.stats.leagueLeaders({Season: season, SeasonType: season_type, PerMode: per_mode, StatCategory: stat_category})
-					.then(response => { sendMsg({
-						"resource": response.resource, 
-						"parameters": response.parameters, 
-						"resultSet": convertData(response.resultSet)}, season)
-					 })
-					.catch(error => { sendError(error); })
-			} else if (league_type === "standings") {
-				NBA.stats.leagueStandings({Season: season, SeasonType: season_type})
-					.then(response => { sendMsg({
-						"resource": response.resource, 
-						"parameters": response.parameters, 
-						"resultSet": convertData(response.resultSets[0])}, season)
-					})
-					.catch(error => { sendError(error) })
-			} else if (league_type === "game log") {
-				NBA.stats.leagueGameLog({PlayerOrTeam: p_or_t, Season: season, SeasonType: season_type, Sorter: sorter})
-					.then(response => { sendMsg({
-						"resource": response.resource, 
-						"parameters": response.parameters, 
-						"resultSet": convertData(response.resultSets[0])}, season)
-					})
-					.catch(error => { sendError(error) })
+			if (league_type === "shooting") {
+				league_type = (p_or_t === "P") ? "player_shooting" : "team_shooting";
+			} else if (league_type === "hustle") {
+				league_type = (p_or_t === "P") ? "player_hustle" : "team_hustle";
+			} else if (league_type === "clutch") {
+				league_type = (p_or_t === "P") ? "player_clutch" : "team_clutch";
 			} else if (league_type === "player tracking") {
 				// This particular endpoint wants "Player"/"Team" instead of "P"/"T" https://github.com/bttmly/nba-client-template/blob/master/nba.json
-				var player_or_team = (p_or_t === "P") ? "Player" : "Team";
-				NBA.stats.playerTracking({PlayerOrTeam: player_or_team, Season: season, SeasonType: season_type, PtMeasureType: pt_measure_type, PerMode: per_mode})
-					.then(response => { sendMsg(response.leagueDashPtStats, season) })
-					.catch(error => { sendError(error) })
-			} else if (league_type === "shooting") {
-				if (p_or_t === "P") {
-					NBA.stats.playerShooting({Season: season, SeasonType: season_type, PerMode: per_mode})
-						.then(response => { sendMsg(response.leagueDashPTShots, season); })
-						.catch(error => { sendError(error) })
-				} else if (p_or_t === "T") {
-					NBA.stats.teamShooting({Season: season, SeasonType: season_type, PerMode: per_mode})
-						.then(response => { sendMsg(response.leagueDashPTShots, season); })
-						.catch(error => { sendError(error) })
-				}
-			} else if (league_type === "hustle") {
-				if (p_or_t === "P") {
-					NBA.stats.playerHustle({Season: season, SeasonType: season_type, PerMode: per_mode})
-						.then(response => { sendMsg({
-							"resource": response.resource, 
-							"parameters": response.parameters, 
-							"resultSet": convertData(response.resultSets[0])}, season)
-						})
-						.catch(error => { sendError(error) })
-				} else if (p_or_t === "T") {
-					NBA.stats.teamHustle({Season: season, SeasonType: season_type, PerMode: per_mode})
-						.then(response => { sendMsg({
-							"resource": response.resource, 
-							"parameters": response.parameters, 
-							"resultSet": convertData(response.resultSets[0])}, season)
-						})
-						.catch(error => { sendError(error) })
-				}
-			} else if (league_type === "clutch") {
-				if (p_or_t === "P") {
-					NBA.stats.playerClutch({Season: season, SeasonType: season_type, PerMode: per_mode, AheadBehind: ahead_behind, ClutchTime: clutch_time, PointDiff: point_diff})
-						.then(response => { sendMsg(response.leagueDashPlayerClutch, season); })
-						.catch(error => { sendError(error) })
-				} else if (p_or_t === "T") {
-					NBA.stats.teamClutch({Season: season, SeasonType: season_type, PerMode: per_mode, AheadBehind: ahead_behind, ClutchTime: clutch_time, PointDiff: point_diff})
-						.then(response => { sendMsg(response.leagueDashTeamClutch, season); })
-						.catch(error => { sendError(error) })
-				}
-			} else if (league_type === "lineups") {
-				NBA.stats.lineups({Season: season, SeasonType: season_type, PerMode: per_mode, MeasureType: measure_type, GroupQuantity: group_quantity})
-					.then(response => { sendMsg(response, season); })
-					.catch(error => { sendError(error) })
+				p_or_t = (p_or_t === "P") ? "Player" : "Team";
 			}
 
-			function sendMsg(payload, statusMsg) {
+			var params_dict = {
+				"scoreboard": {gameDate: game_date},
+				"leaders": {Season: season, SeasonType: season_type, PerMode: per_mode, StatCategory: stat_category},
+				"standings": {Season: season, SeasonType: season_type},
+				"game log": {PlayerOrTeam: p_or_t, Season: season, SeasonType: season_type, Sorter: sorter},
+				"player tracking": {PlayerOrTeam: p_or_t, Season: season, SeasonType: season_type, PtMeasureType: pt_measure_type, PerMode: per_mode},
+				"player_shooting": {Season: season, SeasonType: season_type, PerMode: per_mode},
+				"team_shooting": {Season: season, SeasonType: season_type, PerMode: per_mode},
+				"player_hustle": {Season: season, SeasonType: season_type, PerMode: per_mode},
+				"team_hustle": {Season: season, SeasonType: season_type, PerMode: per_mode},
+				"player_clutch": {Season: season, SeasonType: season_type, PerMode: per_mode, AheadBehind: ahead_behind, ClutchTime: clutch_time, PointDiff: point_diff},
+				"team_clutch": {Season: season, SeasonType: season_type, PerMode: per_mode, AheadBehind: ahead_behind, ClutchTime: clutch_time, PointDiff: point_diff},
+				"lineups": {Season: season, SeasonType: season_type, PerMode: per_mode, MeasureType: measure_type, GroupQuantity: group_quantity}
+			}
+
+			method_dict[league_type](params_dict[league_type])
+				.then (response => { sendMsg(cleanData(response)) })
+				.catch (error => { sendError(error) })
+
+			function sendMsg(payload) {
+				var status_msg = (league_type === "scoreboard") ? game_date : season;
 				msg.payload = payload;
 				node.send(msg);
-				node.status({fill:"green",shape:"dot",text:statusMsg});
+				node.status({fill:"green",shape:"dot",text:status_msg});
 			}
 
 			function sendError(error) {
@@ -371,7 +327,12 @@ module.exports = function(RED) {
 
 	function GameNode(n) {
 		RED.nodes.createNode(this,n);
-        var node = this;
+		var node = this;
+		
+		var method_dict = {
+			"play-by-play": NBA.stats.playByPlay,
+			"shot chart": NBA.stats.shots,
+		}
 
 		node.status({});
 		node.on('input', function(msg) {
@@ -380,6 +341,13 @@ module.exports = function(RED) {
 
 			node.status({fill:"blue",shape:"dot",text:game_id});
 
+			var params_dict = {
+				"play-by-play": {GameID: game_id},
+				"shot chart": {GameID: game_id},
+			}
+
+
+			// Calls 2 endpoints to get complete box score data
 			if (game_type === "box score") {		
 				var payload = {};		
 				var callback_count = 0;
@@ -414,15 +382,11 @@ module.exports = function(RED) {
 						sendMsg(payload);
 					}
 				}
-			} else if (game_type === "play-by-play") {
-				NBA.stats.playByPlay({GameID: game_id})
-					.then(response => { sendMsg(response) })
-					.catch(error => { 	sendError(error)})
-			} else if (game_type === "shot chart") {
-				NBA.stats.shots({GameID: game_id})
-					.then(response => { sendMsg(response) })
-					.catch(error => { sendError(error) })
-			} 			
+			 } else {
+				method_dict[game_type](params_dict[game_type])
+					.then (response => { sendMsg(response) })
+					.catch (error => { sendError(error) })
+			 }			
 
 			function sendMsg(payload) {
 				msg.payload = payload;

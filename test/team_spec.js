@@ -67,7 +67,7 @@ describe('Team node: ', function () {
           var n1 = helper.getNode("n1");
           n2.on("input", function (msg) {
             msg.should.have.property("payload");
-            msg.payload.should.have.property("teamId", 1610612752);
+            msg.payload[0].should.have.property("teamId", 1610612752);
             done();
           });
           n1.receive({ payload: "1610612752" });
@@ -84,7 +84,7 @@ describe('Team node: ', function () {
           var n1 = helper.getNode("n1");
           n2.on("input", function (msg) {
             msg.should.have.property("payload");
-            msg.payload.should.have.property("teamId", 1610612752);
+            msg.payload[0].should.have.property("teamId", 1610612752);
             done();
           });
           n1.receive({ payload: "1610612752", season_type: "Regular Season" });
@@ -101,7 +101,7 @@ describe('Team node: ', function () {
           var n1 = helper.getNode("n1");
           n2.on("input", function (msg) {
             msg.should.have.property("payload");
-            msg.payload.should.have.property("teamId", 1610612752);
+            msg.payload[0].should.have.property("teamId", 1610612752);
             done();
           });
           n1.receive({ payload: "1610612752", per_mode: "PerGame" });
@@ -118,7 +118,7 @@ describe('Team node: ', function () {
           var n1 = helper.getNode("n1");
           n2.on("input", function (msg) {
             msg.should.have.property("payload");
-            msg.payload.should.have.property("teamId", 1610612752);
+            msg.payload[0].should.have.property("teamId", 1610612752);
             done();
           });
           n1.receive({ payload: "", season: "2018-19" });
@@ -135,8 +135,9 @@ describe('Team node: ', function () {
           var n1 = helper.getNode("n1");
           n2.on("input", function (msg) {
             msg.should.have.property("payload");
-            msg.payload[0].should.have.property("playerId");
-            msg.payload[0].should.have.property("fgm");
+            msg.payload.should.have.property("leagueDashPTShots");
+            msg.payload.leagueDashPTShots[0].should.have.property("playerId");
+            msg.payload.leagueDashPTShots[0].should.have.property("fgm");
             done();
           });
           n1.receive({ payload: ""});
@@ -153,8 +154,9 @@ describe('Team node: ', function () {
           var n1 = helper.getNode("n1");
           n2.on("input", function (msg) {
             msg.should.have.property("payload");
-            msg.payload.should.have.property("teamId", 1610612752);
-            msg.payload.should.have.property("fgm");
+            msg.payload.should.have.property("leagueDashPTShots");
+            msg.payload.leagueDashPTShots[0].should.have.property("teamId", 1610612752);
+            msg.payload.leagueDashPTShots[0].should.have.property("fgm");
             done();
           });
           n1.receive({ payload: ""});
@@ -171,8 +173,9 @@ describe('Team node: ', function () {
           var n1 = helper.getNode("n1");
           n2.on("input", function (msg) {
             msg.should.have.property("payload");
-            msg.payload.should.have.property("teamId", 1610612752);
-            msg.payload.should.have.property("fgm");
+            msg.payload.should.have.property("leagueDashPTShots");
+            msg.payload.leagueDashPTShots[0].should.have.property("teamId", 1610612752);
+            msg.payload.leagueDashPTShots[0].should.have.property("fgm");
             done();
           });
           n1.receive({ payload: "", player_team: "T"});

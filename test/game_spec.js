@@ -5,7 +5,7 @@ var nbaNode = require("../nba.js")
 
 helper.init(require.resolve('node-red'));
 
-describe('Database node: ', function () {
+describe('Game node: ', function () {
 
     beforeEach(function (done) {
         helper.startServer(done);
@@ -43,7 +43,6 @@ describe('Database node: ', function () {
                 msg.payload.should.have.property("playerStats");
                 msg.payload.should.have.property("teamStats");
                 msg.payload.should.have.property("starterBenchStats");
-
                 done();
           });
           n1.receive({ payload: "" });
