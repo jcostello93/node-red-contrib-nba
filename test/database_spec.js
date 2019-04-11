@@ -5,6 +5,8 @@ var nbaNode = require("../nba.js")
 
 helper.init(require.resolve('node-red'));
 
+console.log("It is recommended to comment line 4 'NBA.updatePlayers()' out of ../nba.js or else the tests will hit a rate limit");
+
 describe('Database node: ', function () {
 
     beforeEach(function (done) {
@@ -30,14 +32,21 @@ describe('Database node: ', function () {
           var n2 = helper.getNode("n2");
           var n1 = helper.getNode("n1");
           n2.on("input", function (msg) {
-                msg.should.have.property("payload", "complete");
-                done();
+              msg.should.have.property("payload");
+              msg.payload.length.should.be.above(0);
+              msg.payload[0].should.have.property("firstName");
+              msg.payload[0].should.have.property("lastName");
+              msg.payload[0].should.have.property("playerId");
+              msg.payload[0].should.have.property("teamId");
+              msg.payload[0].should.have.property("fullName");
+              msg.payload[0].should.have.property("downcaseName");
+              done();
           });
           n1.receive({ payload: "" });
         });
       });
 
-      it('should return an array of player objects', function (done) {
+      it('get all players', function (done) {
         var flow = [
           { id: "n1", type: "database", name: "get",wires:[["n2"]], database_type: "get data", get_type: "all players" },
           { id: "n2", type: "helper" }
@@ -60,7 +69,7 @@ describe('Database node: ', function () {
         });
       });
 
-      it('should return an array of team objects', function (done) {
+      it('get all teams', function (done) {
         var flow = [
           { id: "n1", type: "database", name: "get",wires:[["n2"]], database_type: "get data", get_type: "all teams" },
           { id: "n2", type: "helper" }
@@ -82,7 +91,7 @@ describe('Database node: ', function () {
         });
       });
 
-      it('should return a player object by id (Stephen Curry)', function (done) {
+      it('get one player by id', function (done) {
         var flow = [
           { id: "n1", type: "database", name: "get",wires:[["n2"]], database_type: "get data", get_type: "one player", object_id: "201939", source: "id" },
           { id: "n2", type: "helper" }
@@ -99,7 +108,7 @@ describe('Database node: ', function () {
         });
       });
 
-      it('should return a player object by name (Stephen Curry)', function (done) {
+      it('get one player by name', function (done) {
         var flow = [
           { id: "n1", type: "database", name: "get",wires:[["n2"]], database_type: "get data", get_type: "one player", source: "name", first_name: "Stephen", last_name: "Curry" },
           { id: "n2", type: "helper" }
@@ -116,7 +125,7 @@ describe('Database node: ', function () {
         });
       });
 
-      it('should return a team object by id (Knicks)', function (done) {
+      it('get one team by id', function (done) {
         var flow = [
           { id: "n1", type: "database", name: "get",wires:[["n2"]], database_type: "get data", get_type: "one team", object_id: "1610612752", source: "id" },
           { id: "n2", type: "helper" }
@@ -133,7 +142,7 @@ describe('Database node: ', function () {
         });
       });
 
-      it('should return a team object by name (Knicks)', function (done) {
+      it('get one team by name', function (done) {
         var flow = [
           { id: "n1", type: "database", name: "get",wires:[["n2"]], database_type: "get data", get_type: "one team", source: "name", team_name: "Knicks" },
           { id: "n2", type: "helper" }
@@ -149,7 +158,7 @@ describe('Database node: ', function () {
         });
       });
 
-      it('first_name mustache', function (done) {
+      it('(node) first_name mustache', function (done) {
         var flow = [
           { id: "n1", type: "database", name: "get",wires:[["n2"]], database_type: "get data", get_type: "one player", source: "name", first_name: "{{payload}}", last_name: "Curry" },
           { id: "n2", type: "helper" }
@@ -166,7 +175,7 @@ describe('Database node: ', function () {
         });
       });
 
-      it('last_name mustache', function (done) {
+      it('(node) last_name mustache', function (done) {
         var flow = [
           { id: "n1", type: "database", name: "get",wires:[["n2"]], database_type: "get data", get_type: "one player", source: "name", first_name: "Stephen", last_name: "{{payload}}" },
           { id: "n2", type: "helper" }
@@ -183,7 +192,7 @@ describe('Database node: ', function () {
         });
       });
 
-      it('team_name mustache', function (done) {
+      it('(node) team_name mustache', function (done) {
         var flow = [
           { id: "n1", type: "database", name: "get",wires:[["n2"]], database_type: "get data", get_type: "one team", source: "name", team_name: "{{payload}}" },
           { id: "n2", type: "helper" }
@@ -200,7 +209,7 @@ describe('Database node: ', function () {
         });
       });
 
-      it('preserve msg.topic', function (done) {
+      it('(node) preserve msg.topic', function (done) {
         var flow = [
           { id: "n1", type: "database", name: "get",wires:[["n2"]], database_type: "get data", get_type: "one team", source: "name", team_name: "{{payload}}" },
           { id: "n2", type: "helper" }
