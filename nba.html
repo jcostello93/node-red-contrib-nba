@@ -190,6 +190,10 @@
         
 
         function addOption(param, select) {
+            if (param === "" || param === " ") {
+                return; 
+            }
+
             var option = document.createElement("option");
             option.text = param;
             option.value = param;
@@ -394,6 +398,10 @@
         
 
         function addOption(param, select) {
+            if (param === "" || param === " ") {
+                return; 
+            }
+
             var option = document.createElement("option");
             option.text = param;
             option.value = param;
@@ -559,10 +567,10 @@
         </select>
     </div>
     <div class="form-row" id="node-action-player_team"> 
-        <label for="node-input-player_team"><i class="fa fa-wrench"></i> group by</label>
+        <label for="node-input-player_team"><i class="fa fa-wrench"></i> player or team</label>
         <select type="text" id="node-input-player_team" style="display: inline-block; width: 250px; vertical-align: top;">
-            <option value="P" outputs="1">player</option>
-            <option value="T" outputs="1">team</option>
+            <option value="P" outputs="1">Player</option>
+            <option value="T" outputs="1">Team</option>
             <option value="dynamic" outputs="1">load from msg.player_team</option>
         </select>
     </div>
@@ -659,6 +667,10 @@
         
 
         function addOption(param, select) {
+            if (param === "" || param === " ") {
+                return; 
+            }
+
             var option = document.createElement("option");
             option.text = param;
             option.value = param;
@@ -863,10 +875,10 @@
         </select>
     </div>
     <div class="form-row" id="node-action-player_team"> 
-        <label for="node-input-player_team"><i class="fa fa-wrench"></i> group by</label>
+        <label for="node-input-player_team"><i class="fa fa-wrench"></i> player or team</label>
         <select type="text" id="node-input-player_team" style="display: inline-block; width: 250px; vertical-align: top;">
-            <option value="P" outputs="1">player</option>
-            <option value="T" outputs="1">team</option>
+            <option value="P" outputs="1">Player</option>
+            <option value="T" outputs="1">Team</option>
             <option value="dynamic" outputs="1">load from msg.player_team</option>
         </select>
     </div>    

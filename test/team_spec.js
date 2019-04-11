@@ -5,6 +5,9 @@ var nbaNode = require("../nba.js")
 
 helper.init(require.resolve('node-red'));
 
+console.log("It is recommended to comment line 4 'NBA.updatePlayers()' out of ../nba.js or else the tests will hit a rate limit");
+
+
 describe('Team node: ', function () {
 
     beforeEach(function (done) {
