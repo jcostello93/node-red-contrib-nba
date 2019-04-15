@@ -3,7 +3,7 @@ module.exports = function(RED) {
 	var NBA = require("nba");
 	NBA.updatePlayers();
 	var mustache = require("mustache");
-	var NBA_CLIENT = require("nba-client-template");
+	var NBA_CLIENT = require("nba-client-template");	
 
 	// In order of priority: 1. HTML text OR mustache syntax, 2. msg.msgProp 
 	function parseField(msg, nodeProp, msgProp) {
@@ -17,6 +17,39 @@ module.exports = function(RED) {
 		}
 
 		return field;
+	}
+
+	// This function takes an object with a header array and a 2D data array and maps them to an array of objects
+	// Ex parameters: obj.headers = [PTS, MIN]
+	//               obj.rowSet = [[25, 37], [40, 35]]
+
+	// Ex result:    result = [{PTS: 25, MIN: 37}, {PTS: 40, MIN: 35}]
+
+	function convertData(obj) {
+		var headers = obj.headers;
+		var rowSet = obj.rowSet;
+
+		var result = [];
+
+		for (var i = 0; i < rowSet.length; i++) {
+			var tempObj = {};
+			for (var j = 0; j < headers.length; j++) {
+				tempObj[headers[j]] = rowSet[i][j];
+			}
+			result.push(tempObj);
+		}
+
+		return result; 
+	}
+
+	function cleanData(response) {
+		if (response.resultSet) {
+			response.cleanedData = convertData(response.resultSet);
+		} else if (response.resultSets) {
+			response.cleanedData = convertData(response.resultSets[0]);
+		}
+
+		return response;
 	}
 
 	function playerObjFromID(player_id) {
@@ -223,6 +256,7 @@ module.exports = function(RED) {
 		return params_dict; 
 	}
 
+	// Calls getBoxScore and returns a promise to preserve the call structure in GameNode
 	function boxScorePromise(params) {
 		return new Promise((resolve, reject) => {
 			getBoxScore(params, (payload, error) => {
@@ -235,6 +269,7 @@ module.exports = function(RED) {
 		})
 	}
 
+	// Calls callback from boxScorePromise when both API calls have finished
 	function getBoxScore(params, cb) {
 		var payload = {};		
 		var callback_count = 0;
@@ -283,38 +318,6 @@ module.exports = function(RED) {
 		return props; 
 	}
 
-	// This function takes an object with a header array and a 2D data array and maps them to an array of objects
-	// Ex paramters: obj.headers = [PTS, MIN]
-	//               obj.rowSet = [[25, 37], [40, 35]]
-
-	// Ex result:    result = [{PTS: 25, MIN: 37}, {PTS: 40, MIN: 35}]
-
-	function convertData(obj) {
-		var headers = obj.headers;
-		var rowSet = obj.rowSet;
-
-		var result = [];
-
-		for (var i = 0; i < rowSet.length; i++) {
-			var tempObj = {};
-			for (var j = 0; j < headers.length; j++) {
-				tempObj[headers[j]] = rowSet[i][j];
-			}
-			result.push(tempObj);
-		}
-
-		return result; 
-	}
-
-	function cleanData(response) {
-		if (response.resultSet) {
-			response.cleanedData = convertData(response.resultSet);
-		} else if (response.resultSets) {
-			response.cleanedData = convertData(response.resultSets[0]);
-		}
-
-		return response;
-	}
 
 	function _updatePlayers() {
 		NBA.updatePlayers(); 
@@ -429,11 +432,17 @@ module.exports = function(RED) {
 
 		node.on('input', function(msg) {
 			var props = getTeamProps(n, msg);
-
-			var team_name = teamObjFromID(props.team_id).simpleName;
-			setLoadingStatus(node, team_name);
-
 			var params_dict = getTeamParams(props); 
+			var team_obj = teamObjFromID(props.team_id);
+
+			// Send error and bail if team isn't found
+			if (!team_obj) {
+				node.error("Invalid team id", msg);
+				return;
+			} 
+
+			var team_name = team_obj.simpleName;
+			setLoadingStatus(node, team_name);			
 
 			method_dict[props.team_type](params_dict[props.team_type])
 				.then (response => { 
