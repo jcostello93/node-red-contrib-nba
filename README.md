@@ -1,11 +1,25 @@
 # node-red-contrib-nba
-Access the NBA Stats API using Node-RED.
+Access the NBA Stats API using [Node-RED](https://nodered.org/).
 
 # Overview 
 The goal of this project is to provide easy access to the robust, yet undocumented NBA Stats API using Node-RED, a visual, flow-based development tool. Whether you're looking to create an NBA database, get the latest scores and stats, peform data analysis, or build an interactive website, this tool will help you get the data you need without having to research all the endpoints of the NBA Stats API. 
 
+With the NBA and other Node-RED nodes, you can create charts like this ... 
+
+![fg3m-dashboard](screenshots/fg3m-dashboard.png?raw=true "fg3m-dashboard")
+
+... with just a few lines of JavaScript: 
+
+![fg3m-js-flow](screenshots/fg3m-js-flow.png?raw=true "fg3m-js-flow")
+
+... or no JavaScript at all: 
+
+![fg3m-nojs-flow](screenshots/fg3m-nojs-flow.png?raw=true "fg3m-nojs-flow")
+
+
+
 # Dependencies and references
-This project uses the nba npm module to call the various endpoints of the NBA Stats API. Please refer to this module's GitHub for futher information regarding the API's stability and usability as well as blacklisted IP addresses. 
+This project uses the [nba npm module](https://www.npmjs.com/package/nba) to call the various endpoints of the NBA Stats API. Please refer to this module's [GitHub](https://github.com/bttmly/nba#readme) for futher information regarding the API's stability and usability as well as blacklisted IP addresses. 
 
 # Nodes 
 
@@ -78,7 +92,7 @@ The get a game id, use the league node to get a scoreboard for a given game day.
 
 ## Valid Parameters
 
-The nodes dynamically load dropdown options from the nba.json file in the nba-client-template npm module. 
+The nodes dynamically load dropdown options from the [nba.json](https://github.com/bttmly/nba-client-template/blob/master/nba.json) file in the [nba-client-template npm module](https://www.npmjs.com/package/nba-client-template). 
 
 ## Dynamically loading inputs
 
@@ -90,17 +104,26 @@ Most of the node inputs can be dynamically loaded. There are two ways to do this
 
 A simple example is using the database node to get a team by name and then sending the response to a team node. Because the database node returns a team object in <code>msg.payload</code> with the team id in <code>msg.payload.teamId</code>, you can now fill in <code>{{payload.teamId}}</code> in the team id field of the team node. 
 
-TO DO: Add screenshot
+![database-to-team](screenshots/database-to-team.png?raw=true "database-to-team")
+
+![team-profile-mustache](screenshots/team-profile-mustache.png?raw=true "team-profile-mustache")
+
 
 ### Dropdown options
 
-**Dropdown fields** may be selected from the menu or dynamically populated via the specified property of the incoming msg object. For example, if loading measure type dynamically, the dropdown menu designates <code>msg.measure_type</code> as the specified property. 
+**Dropdown fields** may be selected from the menu or dynamically populated via the specified property of the incoming msg object. For example, if loading measure type dynamically, the dropdown menu designates <code>msg.measure_type</code> as the specified property. When using this open, the property must be set earlier in the flow. 
+
+![dynamic-dropdown](screenshots/dynamic-dropdown.png?raw=true "dynamic-dropdown")
+
+![dynamic-dropdown-function](screenshots/dynamic-dropdown-function.png?raw=true "dynamic-dropdown-function")
+
+![dynamic-dropdown-team](screenshots/dynamic-dropdown-team.png?raw=true "dynamic-dropdown-team")
 
 ## Getting id's
 
 Use the database node to get player and team id's. 
 
-Use the league node
+Use the league node to get a scoreboard for a given game day. The game id will be located in <code>msg.payload.gameHeader[i].gameId</code>.
 
 ## The cleanedData field
 
@@ -116,7 +139,7 @@ In this case, the node-red-contrib-nba module adds a cleanedData field that comb
 
 # Tests
 
-The /test directiory contains unit tests for each node using the node-red-test-helper and mocha libraries. 
+The [test]("test") directiory contains unit tests for each node using the [node-red-test-helper](https://github.com/node-red/node-red-node-test-helper) and [mocha](https://www.npmjs.com/package/mocha) libraries. 
 
 To run all tests: 
 
@@ -146,13 +169,40 @@ To test the game node:
 
 ## Get all players. Download the flow. 
 
-## Save all players in a file. Download the flow. 
-
-## Develop an interactive website that displays the current year's standings. 
+![get-all-players-flow](screenshots/get-all-players-flow.png?raw=true "get-all-players-flow")
 
 ## Develop an interactive website that displays a day's scoreboard. Download the flow. 
 
+![scoreboard-flow](screenshots/scoreboard-flow.png?raw=true "scoreboard-flow")
+
+![scoreboard](screenshots/scoreboard.png?raw=true "scoreboard")
+
+## Develop an interactive website that displays the current year's standings.
+
+![standings-flow](screenshots/standings-flow.png?raw=true "standings-flow")
+
+![standings](screenshots/standings.png?raw=true "standings")
+
+## Display a game's box score. Download the flow. 
+
+![box-score-flow](screenshots/box-score-flow.png?raw=true "box-score-flow")
+
+![box-score](screenshots/box-score.png?raw=true "box-score")
+
+## Display a game's play-by-play. Download the flow. 
+
+![play-by-play-flow](screenshots/play-by-play-flow.png?raw=true "play-by-play-flow")
+
+![play-by-play](screenshots/play-by-play.png?raw=true "play-by-play")
+
+
 ## Develop an interactive website that displays a team's lineups. Download the flow. 
+
+## Create a Node-RED dashboard that displays the top 3pt shooters in the league. Download the flow. 
+
+![fg3m-dashboard](screenshots/fg3m-dashboard.png?raw=true "fg3m-dashboard")
+
+## Download all website flows at once with a menu toolbar
 
 
 

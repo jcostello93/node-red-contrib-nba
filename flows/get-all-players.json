@@ -1,0 +1,56 @@
+[
+    {
+        "id": "9cabfd1e.c2c5a",
+        "type": "inject",
+        "z": "6a8799bb.b0d028",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 200,
+        "y": 80,
+        "wires": [
+            [
+                "8d0ae5d4.0aee28"
+            ]
+        ]
+    },
+    {
+        "id": "8d0ae5d4.0aee28",
+        "type": "database",
+        "z": "6a8799bb.b0d028",
+        "name": "",
+        "database_type": "get data",
+        "get_type": "all players",
+        "first_name": "",
+        "last_name": "",
+        "team_name": "",
+        "source": "name",
+        "object_id": "",
+        "x": 400,
+        "y": 80,
+        "wires": [
+            [
+                "8e6737f6.801618"
+            ]
+        ]
+    },
+    {
+        "id": "8e6737f6.801618",
+        "type": "debug",
+        "z": "6a8799bb.b0d028",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "x": 590,
+        "y": 80,
+        "wires": []
+    }
+]
