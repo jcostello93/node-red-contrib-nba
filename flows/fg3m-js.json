@@ -1,0 +1,187 @@
+[
+    {
+        "id": "e17e8c29.777a4",
+        "type": "league",
+        "z": "4791e752.ab3ef8",
+        "name": "",
+        "league_type": "leaders",
+        "season": "2018-19",
+        "season_type": "Regular Season",
+        "game_date": "",
+        "per_mode": "Totals",
+        "stat_category": "FG3M",
+        "sorter": "PTS",
+        "player_team": "P",
+        "measure_type": "Base",
+        "ahead_behind": "",
+        "point_diff": "",
+        "clutch_time": "",
+        "group_quantity": "5",
+        "pt_measure_type": "",
+        "x": 460,
+        "y": 80,
+        "wires": [
+            [
+                "831366e6.f5ee48"
+            ]
+        ]
+    },
+    {
+        "id": "d0f31afa.34f518",
+        "type": "ui_chart",
+        "z": "4791e752.ab3ef8",
+        "name": "",
+        "group": "a292df62.ceb28",
+        "order": 0,
+        "width": "13",
+        "height": "8",
+        "label": "Top 50 Total 3PT FGM",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "SSS",
+        "interpolate": "linear",
+        "nodata": "waiting for data",
+        "dot": true,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "0",
+        "removeOlderPoints": "10",
+        "removeOlderUnit": "1",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "x": 840,
+        "y": 160,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "d27cd6ff.24a008",
+        "type": "ui_button",
+        "z": "4791e752.ab3ef8",
+        "name": "",
+        "group": "a292df62.ceb28",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "call API",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "x": 220,
+        "y": 80,
+        "wires": [
+            [
+                "e17e8c29.777a4"
+            ]
+        ]
+    },
+    {
+        "id": "fadcd1ed.cead1",
+        "type": "ui_button",
+        "z": "4791e752.ab3ef8",
+        "name": "",
+        "group": "a292df62.ceb28",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "reset chart",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "x": 230,
+        "y": 160,
+        "wires": [
+            [
+                "c7af31b1.43625"
+            ]
+        ]
+    },
+    {
+        "id": "831366e6.f5ee48",
+        "type": "function",
+        "z": "4791e752.ab3ef8",
+        "name": "get first 10 players",
+        "func": "msg.payload = msg.payload.cleanedData.splice(0, 50);\n\nreturn [msg.payload];",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 730,
+        "y": 80,
+        "wires": [
+            [
+                "d8c6d539.1c7928"
+            ]
+        ]
+    },
+    {
+        "id": "c7af31b1.43625",
+        "type": "function",
+        "z": "4791e752.ab3ef8",
+        "name": "reset chart",
+        "func": "msg.payload = [];\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 450,
+        "y": 160,
+        "wires": [
+            [
+                "d0f31afa.34f518"
+            ]
+        ]
+    },
+    {
+        "id": "d8c6d539.1c7928",
+        "type": "function",
+        "z": "4791e752.ab3ef8",
+        "name": "set chart format",
+        "func": "msg.topic = msg.PLAYER;\nmsg.timestamp = msg.FG3M;\nmsg.payload = msg.FG3_PCT;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 980,
+        "y": 80,
+        "wires": [
+            [
+                "d0f31afa.34f518"
+            ]
+        ]
+    },
+    {
+        "id": "a292df62.ceb28",
+        "type": "ui_group",
+        "z": "",
+        "name": "Chart",
+        "tab": "8e292105.50c87",
+        "disp": false,
+        "width": "13",
+        "collapse": false
+    },
+    {
+        "id": "8e292105.50c87",
+        "type": "ui_tab",
+        "z": "",
+        "name": "FG3M",
+        "icon": "dashboard",
+        "order": 1
+    }
+]

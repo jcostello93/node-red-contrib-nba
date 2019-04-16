@@ -1,0 +1,176 @@
+[
+    {
+        "id": "ace44d9.003b0b",
+        "type": "http in",
+        "z": "60f52c2e.45c274",
+        "name": "",
+        "url": "/boxscore/:gameId",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 180,
+        "y": 80,
+        "wires": [
+            [
+                "b141d139.2d3d4"
+            ]
+        ]
+    },
+    {
+        "id": "b141d139.2d3d4",
+        "type": "game",
+        "z": "60f52c2e.45c274",
+        "name": "",
+        "game_id": "{{req.params.gameId}}",
+        "game_type": "box score",
+        "x": 440,
+        "y": 80,
+        "wires": [
+            [
+                "f85e5834.ac8938"
+            ]
+        ]
+    },
+    {
+        "id": "534d8bd2.313a24",
+        "type": "template",
+        "z": "60f52c2e.45c274",
+        "name": "HTML",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<head>\n    <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css\" integrity=\"sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T\" crossorigin=\"anonymous\">\n    <link rel=\"stylesheet\" type=\"text/css\" href=\"/public/{{css}}\">\n</head>\n\n<body>\n\n    <div id=\"buttons-outer-div\" class=\"text-center\">\n        <div id=\"box-score-buttons\" class=\"btn-group btn-group-toggle\" data-toggle=\"buttons\">\n          <label class=\"btn btn-secondary active\">\n            <input type=\"radio\" name=\"options\" id=\"homeButton\" autocomplete=\"off\" checked onchange=\"updateBoxScore(event);\"> {{payload.home_team}}\n          </label>\n          <label class=\"btn btn-secondary\">\n            <input type=\"radio\" name=\"options\" id=\"visitorButton\" autocomplete=\"off\" onchange=\"updateBoxScore(event);\"> {{payload.visitor_team}}\n          </label>\n        </div>\n    </div>\n    \n    <p id=\"game-date\" class=\"text-right\" >{{payload.game_date}}</p>\n    \n    <table id=\"home-table\" class=\"table box-score\">\n        <thead>\n            <tr>\n                <th>{{payload.home_team}}</th>\n                <th>Min</th>\n                <th>FG</th>\n                <th>FT</th>\n                <th>3PT</th>\n                <th>+/-</th>\n                <th>OR</th>\n                <th>Reb</th>\n                <th>A</th>\n                <th>Blk</th>\n                <th>Stl</th>\n                <th>TO</th>\n                <th>PF</th>\n                <th>Pts</th>\n            </tr>\n        </thead>\n        <tbody>\n            {{#payload.home_roster}}\n                <tr>\n                    <td>{{PLAYER_NAME}}</td>\n                    <td>{{MIN}}</td>\n                    <td>{{FGM}}-{{FGA}}</td>\n                    <td>{{FTM}}-{{FTA}}</td>\n                    <td>{{FG3M}}-{{FG3A}}</td>\n                    <td>{{PLUS_MINUS}}</td>\n                    <td>{{OREB}}</td>\n                    <td>{{REB}}</td>\n                    <td>{{AST}}</td>\n                    <td>{{BLK}}</td>\n                    <td>{{STL}}</td>\n                    <td>{{TO}}</td>\n                    <td>{{PF}}</td>\n                    <td>{{PTS}}</td>\n                </tr>\n            {{/payload.home_roster}}\n        </tbody>\n        <tfoot>\n            <tr>\n                <td>Totals</td>\n                <td>{{payload.home_totals.MIN}}</td>\n                <td>{{payload.home_totals.FGM}}-{{payload.home_totals.FGA}}</td>\n                <td>{{payload.home_totals.FTM}}-{{payload.home_totals.FTA}}</td>\n                <td>{{payload.home_totals.FG3M}}-{{payload.home_totals.FG3A}}</td>\n                <td>{{payload.home_totals.PLUS_MINUS}}</td>\n                <td>{{payload.home_totals.OREB}}</td>\n                <td>{{payload.home_totals.REB}}</td>\n                <td>{{payload.home_totals.AST}}</td>\n                <td>{{payload.home_totals.BLK}}</td>\n                <td>{{payload.home_totals.STL}}</td>\n                <td>{{payload.home_totals.TO}}</td>\n                <td>{{payload.home_totals.PF}}</td>\n                <td>{{payload.home_totals.PTS}}</td>\n            </tr>\n        </tfoot>\n    </table>\n    \n    <table id=\"visitor-table\" class=\"table box-score\">\n        <thead>\n            <tr>\n                <th>{{payload.visitor_team}}</th>\n                <th>Min</th>\n                <th>FG</th>\n                <th>FT</th>\n                <th>3PT</th>\n                <th>+/-</th>\n                <th>OR</th>\n                <th>Reb</th>\n                <th>A</th>\n                <th>Blk</th>\n                <th>Stl</th>\n                <th>TO</th>\n                <th>PF</th>\n                <th>Pts</th>\n            </tr>\n        </thead>\n        <tbody>\n            {{#payload.visitor_roster}}\n                <tr>\n                    <td>{{PLAYER_NAME}}</td>\n                    <td>{{MIN}}</td>\n                    <td>{{FGM}}-{{FGA}}</td>\n                    <td>{{FTM}}-{{FTA}}</td>\n                    <td>{{FG3M}}-{{FG3A}}</td>\n                    <td>{{PLUS_MINUS}}</td>\n                    <td>{{OREB}}</td>\n                    <td>{{REB}}</td>\n                    <td>{{AST}}</td>\n                    <td>{{BLK}}</td>\n                    <td>{{STL}}</td>\n                    <td>{{TO}}</td>\n                    <td>{{PF}}</td>\n                    <td>{{PTS}}</td>\n                </tr>\n            {{/payload.visitor_roster}}\n        </tbody>\n        <tfoot>\n            <tr>\n                <td>Totals</td>\n                <td>{{payload.visitor_totals.MIN}}</td>\n                <td>{{payload.visitor_totals.FGM}}-{{payload.visitor_totals.FGA}}</td>\n                <td>{{payload.visitor_totals.FTM}}-{{payload.visitor_totals.FTA}}</td>\n                <td>{{payload.visitor_totals.FG3M}}-{{payload.visitor_totals.FG3A}}</td>\n                <td>{{payload.visitor_totals.PLUS_MINUS}}</td>\n                <td>{{payload.visitor_totals.OREB}}</td>\n                <td>{{payload.visitor_totals.REB}}</td>\n                <td>{{payload.visitor_totals.AST}}</td>\n                <td>{{payload.visitor_totals.BLK}}</td>\n                <td>{{payload.visitor_totals.STL}}</td>\n                <td>{{payload.visitor_totals.TO}}</td>\n                <td>{{payload.visitor_totals.PF}}</td>\n                <td>{{payload.visitor_totals.PTS}}</td>\n            </tr>\n        </tfoot>\n    </table>\n    \n    <script type=\"text/javascript\" src=\"/public/{{script}}\"></script>\n</body>",
+        "output": "str",
+        "x": 850,
+        "y": 80,
+        "wires": [
+            [
+                "3e4d038.b46e1fc"
+            ]
+        ]
+    },
+    {
+        "id": "f85e5834.ac8938",
+        "type": "function",
+        "z": "60f52c2e.45c274",
+        "name": "format response",
+        "func": "var player_stats = msg.payload.playerStats;\nvar game_summary = msg.payload.gameSummary;\nvar team_stats = msg.payload.teamStats;\n\nvar home_roster = player_stats.filter((player => player.TEAM_ID === game_summary.HOME_TEAM_ID ));\nvar visitor_roster = player_stats.filter((player => player.TEAM_ID === game_summary.VISITOR_TEAM_ID ));\nvar home_totals = team_stats.filter((team => team.TEAM_ID === game_summary.HOME_TEAM_ID));\nvar visitor_totals = team_stats.filter((team => team.TEAM_ID === game_summary.VISITOR_TEAM_ID));\n\n\nmsg.script = \"boxscore.js\";\nmsg.css = \"boxscore.css\";\n\nmsg.payload = {\n    \"home_roster\": home_roster,\n    \"visitor_roster\": visitor_roster,\n    \"home_totals\": home_totals[0],\n    \"visitor_totals\": visitor_totals[0],\n    \"home_team\": home_roster[0].TEAM_ABBREVIATION,\n    \"visitor_team\": visitor_roster[0].TEAM_ABBREVIATION,\n    \"game_date\": msg.payload.gameInfo.GAME_DATE\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 660,
+        "y": 80,
+        "wires": [
+            [
+                "534d8bd2.313a24"
+            ]
+        ]
+    },
+    {
+        "id": "8fe2f046.444b4",
+        "type": "http in",
+        "z": "60f52c2e.45c274",
+        "name": "",
+        "url": "/public/boxscore.js",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 180,
+        "y": 180,
+        "wires": [
+            [
+                "f473a25d.9b399"
+            ]
+        ]
+    },
+    {
+        "id": "f473a25d.9b399",
+        "type": "template",
+        "z": "60f52c2e.45c274",
+        "name": "javascript",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "javascript",
+        "syntax": "mustache",
+        "template": "function resetButton(id) {\n    var button = document.getElementById(id);\n    console.log(button);\n    button.parentNode.className = \"btn btn-secondary\";\n    button.removeAttribute(\"checked\");\n    console.log(button);\n}\n\nfunction resetButtons() {\n    resetButton(\"homeButton\");\n    resetButton(\"visitorButton\");\n}\n\nfunction targetButton(button) {\n    button.parentNode.className = \"btn btn-secondary active\";\n}\n\nfunction hideTable(id){\n    var table = document.getElementById(id);\n    table.style.display = \"none\";\n}\n\nfunction hideTables() {\n    hideTable(\"home-table\");\n    hideTable(\"visitor-table\");\n}\n\nfunction showTable(id) {\n    var table = document.getElementById(id);\n    table.style.display = \"table\";\n}\n\nfunction updateBoxScore(event) {\n    event.preventDefault(); \n    //resetButtons();\n    hideTables(); \n    //targetButton(event.target);\n    if (event.target.id === \"homeButton\") {\n        showTable(\"home-table\");\n    } else {\n        showTable(\"visitor-table\");\n    }\n}\n\n// second\n\nasync function updateDate(event) {\n    event.preventDefault(); \n    var date = document.getElementById(\"date\").value;\n    var body = {\"date\": date};\n    var response = await fetch(\"/boxscore\", {\n        \"method\": \"POST\", \n        \"body\": JSON.stringify(body),\n        \"headers\": {\"Content-Type\": \"application/json\"}\n    })\n    // var data = await response.json()\n    // emptyTable(); \n    // addDataToTable(data);\n}\n\n\n\n\n",
+        "output": "str",
+        "x": 440,
+        "y": 180,
+        "wires": [
+            [
+                "d645a15b.d357c"
+            ]
+        ]
+    },
+    {
+        "id": "d645a15b.d357c",
+        "type": "http response",
+        "z": "60f52c2e.45c274",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 640,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "21bf7407.f10cdc",
+        "type": "template",
+        "z": "60f52c2e.45c274",
+        "name": "css",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "css",
+        "syntax": "mustache",
+        "template": ".box-score {\n    width:75%;\n    margin: auto;\n}\n\n.btn-secondary.focus, .btn-secondary:focus, .btn-secondary.focus, .btn-secondary:focus {\n    outline: none;\n    box-shadow: none;\n}\n\n#game-date {\n    margin-right: 12.5%;\n    margin-top: -2rem;\n}\n\n#visitor-table {\n    display: none;\n}\n#box-score-buttons {\n    margin: auto;\n    width: 25%;\n    margin: 2vh 0vh 2vh 0vh;\n}",
+        "output": "str",
+        "x": 430,
+        "y": 240,
+        "wires": [
+            [
+                "7ed6174.2ba40e8"
+            ]
+        ]
+    },
+    {
+        "id": "9fcb82d0.c28d7",
+        "type": "http in",
+        "z": "60f52c2e.45c274",
+        "name": "",
+        "url": "/public/boxscore.css",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 190,
+        "y": 240,
+        "wires": [
+            [
+                "21bf7407.f10cdc"
+            ]
+        ]
+    },
+    {
+        "id": "7ed6174.2ba40e8",
+        "type": "http response",
+        "z": "60f52c2e.45c274",
+        "name": "",
+        "statusCode": "",
+        "headers": {
+            "Content-Type": "text/css"
+        },
+        "x": 650,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "3e4d038.b46e1fc",
+        "type": "http response",
+        "z": "60f52c2e.45c274",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1010,
+        "y": 80,
+        "wires": []
+    }
+]

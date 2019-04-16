@@ -1,0 +1,186 @@
+[
+    {
+        "id": "c75f0586.09e9d8",
+        "type": "league",
+        "z": "df6d0766.8da398",
+        "name": "",
+        "league_type": "standings",
+        "season": "2018-19",
+        "season_type": "Regular Season",
+        "game_date": "",
+        "per_mode": "PerGame",
+        "player_team": "P",
+        "measure_type": "Base",
+        "ahead_behind": "Ahead or Behind",
+        "point_diff": 0,
+        "clutch_time": "Last 5 Minutes",
+        "group_quantity": "5",
+        "pt_measure_type": "CatchShoot",
+        "x": 350,
+        "y": 60,
+        "wires": [
+            [
+                "d3c68339.238e8"
+            ]
+        ]
+    },
+    {
+        "id": "d3c68339.238e8",
+        "type": "function",
+        "z": "df6d0766.8da398",
+        "name": "format response",
+        "func": "var west_standings = msg.payload.cleanedData.filter(team => team.Conference === \"West\");\nvar east_standings = msg.payload.cleanedData.filter(team => team.Conference === \"East\");\n\nvar payload = {\n    \"west_standings\": west_standings,\n    \"east_standings\": east_standings\n}\n\nmsg.script = \"standings.js\";\nmsg.css = \"standings.css\";\n\nmsg.payload = payload;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 580,
+        "y": 60,
+        "wires": [
+            [
+                "7a4c1869.cef208"
+            ]
+        ]
+    },
+    {
+        "id": "9d2e2313.d2318",
+        "type": "http in",
+        "z": "df6d0766.8da398",
+        "name": "",
+        "url": "/standings",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 120,
+        "y": 60,
+        "wires": [
+            [
+                "c75f0586.09e9d8"
+            ]
+        ]
+    },
+    {
+        "id": "7a4c1869.cef208",
+        "type": "template",
+        "z": "df6d0766.8da398",
+        "name": "HTML",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<head>\n    <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css\" integrity=\"sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T\" crossorigin=\"anonymous\">\n    <link rel=\"stylesheet\" type=\"text/css\" href=\"/public/{{css}}\">\n</head>\n\n<body>\n    <div class=\"text-center\">\n        <div id=\"standings-buttons\" class=\"btn-group btn-group-toggle\" data-toggle=\"buttons\">\n          <label class=\"btn btn-secondary active\">\n            <input type=\"radio\" name=\"options\" id=\"westButton\" autocomplete=\"off\" checked onchange=\"updateStandings(event);\"> West\n          </label>\n          <label class=\"btn btn-secondary\">\n            <input type=\"radio\" name=\"options\" id=\"eastButton\" autocomplete=\"off\" onchange=\"updateStandings(event);\"> East\n          </label>\n        </div>\n    </div>\n    \n    <table id=\"west-table\" class=\"table standings\">\n        <thead>\n            <tr>\n                <th>Team</th>\n                <th>W</th>\n                <th>L</th>\n                <th>Pct</th>\n                <th>GB</th>\n                <th>Conf</th>\n                <th>Home</th>\n                <th>Away</th>\n                <th>L10</th>\n                <th>Streak</th>\n            </tr>\n        </thead>\n        <tbody>\n            {{#payload.west_standings}}\n                <tr>\n                    <td>{{TeamName}}</td>\n                    <td>{{WINS}}</td>\n                    <td>{{LOSSES}}</td>\n                    <td>{{WinPCT}}</td>\n                    <td>{{ConferenceGamesBack}}</td>\n                    <td>{{ConferenceRecord}}</td>\n                    <td>{{HOME}}</td>\n                    <td>{{ROAD}}</td>\n                    <td>{{L10}}</td>\n                    <td>{{strCurrentStreak}}</td>\n                </tr>\n            {{/payload.west_standings}}\n        </tbody>\n    </table>\n    \n    <table id=\"east-table\" class=\"table standings\">\n        <thead>\n            <tr>\n                <th>Team</th>\n                <th>W</th>\n                <th>L</th>\n                <th>Pct</th>\n                <th>GB</th>\n                <th>Conf</th>\n                <th>Home</th>\n                <th>Away</th>\n                <th>L10</th>\n                <th>Streak</th>\n            </tr>\n        </thead>\n        <tbody>\n            {{#payload.east_standings}}\n                <tr>\n                    <td>{{TeamName}}</td>\n                    <td>{{WINS}}</td>\n                    <td>{{LOSSES}}</td>\n                    <td>{{WinPCT}}</td>\n                    <td>{{ConferenceGamesBack}}</td>\n                    <td>{{ConferenceRecord}}</td>\n                    <td>{{HOME}}</td>\n                    <td>{{ROAD}}</td>\n                    <td>{{L10}}</td>\n                    <td>{{strCurrentStreak}}</td>\n                </tr>\n            {{/payload.east_standings}}\n        </tbody>\n    </table>\n    \n    <script type=\"text/javascript\" src=\"/public/{{script}}\"></script>\n</body>\n\n\n\n",
+        "output": "str",
+        "x": 790,
+        "y": 60,
+        "wires": [
+            [
+                "c23b0732.03f098"
+            ]
+        ]
+    },
+    {
+        "id": "3a4d4736.5fb558",
+        "type": "http in",
+        "z": "df6d0766.8da398",
+        "name": "",
+        "url": "/public/standings.js",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 140,
+        "y": 160,
+        "wires": [
+            [
+                "f57ed62c.0a5f78"
+            ]
+        ]
+    },
+    {
+        "id": "f57ed62c.0a5f78",
+        "type": "template",
+        "z": "df6d0766.8da398",
+        "name": "javascript",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "javascript",
+        "syntax": "mustache",
+        "template": "function resetButton(id) {\n    var button = document.getElementById(id);\n    button.parentNode.className = \"btn btn-secondary\";\n    button.removeAttribute(\"checked\");\n}\n\nfunction resetButtons() {\n    resetButton(\"eastButton\");\n    resetButton(\"westButton\");\n}\n\nfunction targetButton(button) {\n    console.log(button.parentNode);\n    button.parentNode.className = \"btn btn-secondary active\";\n}\n\nfunction hideTable(id){\n    var table = document.getElementById(id);\n    table.style.display = \"none\";\n}\n\nfunction hideTables() {\n    hideTable(\"west-table\");\n    hideTable(\"east-table\");\n}\n\nfunction showTable(id) {\n    var table = document.getElementById(id);\n    table.style.display = \"table\";\n}\n\nfunction updateStandings(event) {\n    event.preventDefault(); \n    resetButtons();\n    hideTables(); \n    //targetButton(event.target);\n    if (event.target.id === \"westButton\") {\n        showTable(\"west-table\");\n    } else {\n        showTable(\"east-table\");\n    }\n    \n}\n",
+        "output": "str",
+        "x": 400,
+        "y": 160,
+        "wires": [
+            [
+                "95deacb6.44d56"
+            ]
+        ]
+    },
+    {
+        "id": "95deacb6.44d56",
+        "type": "http response",
+        "z": "df6d0766.8da398",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 600,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "22a61084.ea0ec",
+        "type": "template",
+        "z": "df6d0766.8da398",
+        "name": "css",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "css",
+        "syntax": "mustache",
+        "template": ".standings {\n    width: 75%;\n    margin: auto;\n}\n\n.btn-secondary.focus, .btn-secondary:focus, .btn-secondary.focus, .btn-secondary:focus {\n    outline: none;\n    box-shadow: none;\n}\n\n#east-table {\n    display: none;\n}\n#standings-buttons {\n    margin: auto;\n    width: 25%;\n    margin: 2vh 0vh 2vh 0vh;\n}",
+        "output": "str",
+        "x": 390,
+        "y": 220,
+        "wires": [
+            [
+                "bce4c063.ea3bf"
+            ]
+        ]
+    },
+    {
+        "id": "ec0684b7.10bfd8",
+        "type": "http in",
+        "z": "df6d0766.8da398",
+        "name": "",
+        "url": "/public/standings.css",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 150,
+        "y": 220,
+        "wires": [
+            [
+                "22a61084.ea0ec"
+            ]
+        ]
+    },
+    {
+        "id": "bce4c063.ea3bf",
+        "type": "http response",
+        "z": "df6d0766.8da398",
+        "name": "",
+        "statusCode": "",
+        "headers": {
+            "Content-Type": "text/css"
+        },
+        "x": 610,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "c23b0732.03f098",
+        "type": "http response",
+        "z": "df6d0766.8da398",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 990,
+        "y": 60,
+        "wires": []
+    }
+]

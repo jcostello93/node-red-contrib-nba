@@ -1,0 +1,269 @@
+[
+    {
+        "id": "6666f333.f6378c",
+        "type": "http in",
+        "z": "42c39222.3d0e5c",
+        "name": "",
+        "url": "/scoreboard",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 120,
+        "y": 80,
+        "wires": [
+            [
+                "df6d44ed.fc90a8"
+            ]
+        ]
+    },
+    {
+        "id": "637a5f2a.7ae64",
+        "type": "league",
+        "z": "42c39222.3d0e5c",
+        "name": "",
+        "league_type": "scoreboard",
+        "season": "2018-19",
+        "season_type": "Regular Season",
+        "game_date": "{{date}}",
+        "per_mode": "PerGame",
+        "player_team": "P",
+        "measure_type": "Base",
+        "ahead_behind": "Ahead or Behind",
+        "point_diff": 0,
+        "clutch_time": "Last 5 Minutes",
+        "group_quantity": "5",
+        "x": 530,
+        "y": 80,
+        "wires": [
+            [
+                "baceb97f.e96128"
+            ]
+        ]
+    },
+    {
+        "id": "baceb97f.e96128",
+        "type": "function",
+        "z": "42c39222.3d0e5c",
+        "name": "format response",
+        "func": "var scores = msg.payload.lineScore;\nvar header = msg.payload.gameHeader; \n\nvar response = [];\n\nheader.forEach((element, index, array) => {\n    var home = scores.find(team => team.teamId === element.homeTeamId);\n    var visitor = scores.find(team => team.teamId === element.visitorTeamId);\n    var obj = {\n        \"visitorIcon\": \"https://raw.githubusercontent.com/Arieg419/NBA_Scorecard/master/src/client/src/img/\" + visitor.teamAbbreviation + \".png\",\n        \"visitorTeam\": visitor.teamAbbreviation,\n        \"visitorPts\": visitor.pts,\n        \"homeTeam\": home.teamAbbreviation, \n        \"homePts\": home.pts,\n        \"homeIcon\": \"https://raw.githubusercontent.com/Arieg419/NBA_Scorecard/master/src/client/src/img/\" + home.teamAbbreviation + \".png\",\n        \"status\": element.gameStatusText,\n        \"gameId\": element.gameId\n    }\n    response.push(obj);\n});\n\nmsg.script = \"scoreboard.js\";\nmsg.css = \"scoreboard.css\";\nmsg.payload = response; \n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 740,
+        "y": 80,
+        "wires": [
+            [
+                "9f92928c.ac9dc"
+            ]
+        ]
+    },
+    {
+        "id": "9f92928c.ac9dc",
+        "type": "template",
+        "z": "42c39222.3d0e5c",
+        "name": "HTML",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<head>\n    <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css\" integrity=\"sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T\" crossorigin=\"anonymous\">\n    <link rel=\"stylesheet\" type=\"text/css\" href=\"/public/{{css}}\">\n</head>\n\n<body>\n    <form id=\"date-form\" class=\"form-group\" onsubmit=\"updateDate(event);\">\n        <div class=\"input-group\">\n            <input id=\"date\" class=\"form-control\" type=\"date\" value=\"{{date}}\"/>\n            <span class=\"input-group-btn\">\n                <button style=\"margin-left: 10%\" type=\"submit\" class=\"btn btn-primary\">Submit</button>\n            </span>\n        </div>\n    </form>\n    \n    <table id=\"scoreboard\" class=\"table\">\n        <tbody id=\"tbody\">\n            {{#payload}}\n                <tr>\n                    <td><img class=\"icon\" src={{visitorIcon}} /></td>\n                    <td>{{visitorPts}}</td>\n                    <td>\n                        <a href=\"/boxscore/{{gameId}}\">{{status}}</a>\n    \n                    </td>\n                    <td>{{homePts}}</td>\n                    <td><img class=\"icon\" src={{homeIcon}} /></td>\n                </tr>\n            {{/payload}}\n        </tbody>\n    </table>\n    \n    <script type=\"text/javascript\" src=\"/public/{{script}}\"></script>    \n</body>\n",
+        "output": "str",
+        "x": 910,
+        "y": 80,
+        "wires": [
+            [
+                "b7a9937f.fca62"
+            ]
+        ]
+    },
+    {
+        "id": "1c27fa73.db5e16",
+        "type": "http in",
+        "z": "42c39222.3d0e5c",
+        "name": "",
+        "url": "/scoreboard",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 160,
+        "wires": [
+            [
+                "eb416b6b.633688"
+            ]
+        ]
+    },
+    {
+        "id": "42c18583.a697bc",
+        "type": "http response",
+        "z": "42c39222.3d0e5c",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 890,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "eb416b6b.633688",
+        "type": "league",
+        "z": "42c39222.3d0e5c",
+        "name": "",
+        "league_type": "scoreboard",
+        "season": "",
+        "season_type": "Regular Season",
+        "game_date": "{{req.body.date}}",
+        "per_mode": "PerGame",
+        "player_team": "P",
+        "measure_type": "Base",
+        "ahead_behind": "Ahead or Behind",
+        "point_diff": 0,
+        "clutch_time": "Last 5 Minutes",
+        "group_quantity": "5",
+        "x": 410,
+        "y": 160,
+        "wires": [
+            [
+                "e589696b.72fec8"
+            ]
+        ]
+    },
+    {
+        "id": "df6d44ed.fc90a8",
+        "type": "function",
+        "z": "42c39222.3d0e5c",
+        "name": "get today's date",
+        "func": "var tzoffset = (new Date()).getTimezoneOffset() * 60000; \nmsg.date = (new Date(Date.now() - tzoffset)).toISOString().slice(0, 10);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 320,
+        "y": 80,
+        "wires": [
+            [
+                "637a5f2a.7ae64"
+            ]
+        ]
+    },
+    {
+        "id": "19ae7e0c.f05b52",
+        "type": "http in",
+        "z": "42c39222.3d0e5c",
+        "name": "",
+        "url": "/public/scoreboard.js",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 150,
+        "y": 320,
+        "wires": [
+            [
+                "8f5744d.3e547b8"
+            ]
+        ]
+    },
+    {
+        "id": "3778b9dc.e9bc56",
+        "type": "http response",
+        "z": "42c39222.3d0e5c",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 620,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "8f5744d.3e547b8",
+        "type": "template",
+        "z": "42c39222.3d0e5c",
+        "name": "javascript",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "javascript",
+        "syntax": "mustache",
+        "template": "async function updateDate(event) {\n    event.preventDefault(); \n    var date = document.getElementById(\"date\").value;\n    var body = {\"date\": date};\n    var response = await fetch(\"/scoreboard\", {\n        \"method\": \"POST\", \n        \"body\": JSON.stringify(body),\n        \"headers\": {\"Content-Type\": \"application/json\"}\n    })\n    var data = await response.json()\n    emptyTable(); \n    addDataToTable(data);\n}\n\nfunction createIconImg(src) {\n    var img = document.createElement(\"img\");\n    img.src = src; \n    img.className = \"icon\";\n    return img; \n}\n\nfunction addDataToTable(data){\n    var tbody = document.getElementById(\"tbody\");\n    data.forEach((element, index, array) => {\n       var row = tbody.insertRow();  \n       var cell = row.insertCell(); \n       var img = createIconImg(element.visitorIcon);\n       cell.appendChild(img);\n       \n       cell = row.insertCell(); \n       cell.innerText = element.visitorPts;\n       \n       cell = row.insertCell(); \n       var a = document.createElement(\"a\");\n       a.href = \"/boxscore/\" + element.gameId;\n       a.innerText = element.status;\n       cell.appendChild(a);\n       \n       cell = row.insertCell(); \n       cell.innerText = element.homePts;\n       \n       cell = row.insertCell(); \n       img = createIconImg(element.homeIcon)\n       cell.appendChild(img);\n    });\n}\n\nfunction removeChildren(elem) {\n    while (elem.firstChild) {\n        elem.removeChild(elem.firstChild);\n    }\n}\n\nfunction emptyTable() {\n    var tbody = document.getElementById(\"tbody\");\n    removeChildren(tbody);\n}\n",
+        "output": "str",
+        "x": 420,
+        "y": 320,
+        "wires": [
+            [
+                "3778b9dc.e9bc56"
+            ]
+        ]
+    },
+    {
+        "id": "fffe5780.e70d48",
+        "type": "template",
+        "z": "42c39222.3d0e5c",
+        "name": "CSS",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "css",
+        "syntax": "mustache",
+        "template": ".icon {\n    height: 7.5vh;\n    width: auto;\n}\n\n#scoreboard {\n    width:50%;\n    margin: auto;\n}\n\n#date-form {\n    width:50%;\n    margin: auto auto 1rem auto;\n}",
+        "output": "str",
+        "x": 410,
+        "y": 380,
+        "wires": [
+            [
+                "ad63eb60.094368"
+            ]
+        ]
+    },
+    {
+        "id": "fd46ee14.9e25d",
+        "type": "http in",
+        "z": "42c39222.3d0e5c",
+        "name": "",
+        "url": "/public/scoreboard.css",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 150,
+        "y": 380,
+        "wires": [
+            [
+                "fffe5780.e70d48"
+            ]
+        ]
+    },
+    {
+        "id": "ad63eb60.094368",
+        "type": "http response",
+        "z": "42c39222.3d0e5c",
+        "name": "",
+        "statusCode": "",
+        "headers": {
+            "Content-Type": "text/css"
+        },
+        "x": 630,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "e589696b.72fec8",
+        "type": "function",
+        "z": "42c39222.3d0e5c",
+        "name": "format response",
+        "func": "var scores = msg.payload.lineScore;\nvar header = msg.payload.gameHeader; \n\nvar response = [];\n\nvar s = [];\n\nheader.forEach((element, index, array) => {\n    var home = scores.find(team => team.teamId === element.homeTeamId);\n    var visitor = scores.find(team => team.teamId === element.visitorTeamId);\n    var obj = {\n        \"visitorIcon\": \"https://raw.githubusercontent.com/Arieg419/NBA_Scorecard/master/src/client/src/img/\" + visitor.teamAbbreviation + \".png\",\n        \"visitorTeam\": visitor.teamAbbreviation,\n        \"visitorPts\": visitor.pts,\n        \"homeTeam\": home.teamAbbreviation, \n        \"homePts\": home.pts,\n        \"homeIcon\": \"https://raw.githubusercontent.com/Arieg419/NBA_Scorecard/master/src/client/src/img/\" + home.teamAbbreviation + \".png\",\n        // Old NBA game statuses are not \"Final\" like they should be\n        \"status\": (element.gameStatusText === \" \") ? \"Final\" : element.gameStatusText,\n        \"gameId\": element.gameId\n    }\n    response.push(obj);\n});\n\nmsg.script = \"scoreboard.js\";\nmsg.css = \"scoreboard.css\";\nmsg.payload = response; \n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 680,
+        "y": 160,
+        "wires": [
+            [
+                "42c18583.a697bc"
+            ]
+        ]
+    },
+    {
+        "id": "b7a9937f.fca62",
+        "type": "http response",
+        "z": "42c39222.3d0e5c",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1060,
+        "y": 80,
+        "wires": []
+    }
+]

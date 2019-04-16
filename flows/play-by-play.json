@@ -1,0 +1,129 @@
+[
+    {
+        "id": "b83724a3.905b68",
+        "type": "function",
+        "z": "ab4c87ba.ff44c8",
+        "name": "get play description",
+        "func": "msg.payload.playByPlay.forEach((element, index, array) => {\n    element.description = element. homedescription || element.visitordescription || element.neutraldescription; \n})\n\nmsg.css = \"play-by-play.css\"\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 610,
+        "y": 80,
+        "wires": [
+            [
+                "3fa4a833.08e638"
+            ]
+        ]
+    },
+    {
+        "id": "3fa4a833.08e638",
+        "type": "template",
+        "z": "ab4c87ba.ff44c8",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<head>\n    <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css\" integrity=\"sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T\" crossorigin=\"anonymous\">\n    <link rel=\"stylesheet\" type=\"text/css\" href=\"/public/{{css}}\">\n</head>\n\n    <body>\n    <table id=\"play-by-play\" class=\"table\">\n        <thead>\n            <tr>\n                <th>Period</th>\n                <th>Time</th>\n                <th>Score</th>\n                <th>Description</th>\n            </tr>\n        </thead>\n        <tbody>\n            {{#payload.playByPlay}}\n                <tr>\n                    <td>{{period}}</td>\n                    <td>{{wctimestring}}</td>\n                    <td>{{score}}</td>\n                    <td>{{description}}</td>\n                </tr>\n            {{/payload.playByPlay}}\n        </tbody>\n    </table>\n</body>",
+        "output": "str",
+        "x": 820,
+        "y": 80,
+        "wires": [
+            [
+                "aa89570.0e889a8"
+            ]
+        ]
+    },
+    {
+        "id": "53e803a9.a3b1ec",
+        "type": "http in",
+        "z": "ab4c87ba.ff44c8",
+        "name": "",
+        "url": "/play-by-play/:gameId",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 150,
+        "y": 80,
+        "wires": [
+            [
+                "c45281a5.b29bf"
+            ]
+        ]
+    },
+    {
+        "id": "c45281a5.b29bf",
+        "type": "game",
+        "z": "ab4c87ba.ff44c8",
+        "name": "",
+        "game_id": "{{req.params.gameId}}",
+        "game_type": "play-by-play",
+        "x": 390,
+        "y": 80,
+        "wires": [
+            [
+                "b83724a3.905b68"
+            ]
+        ]
+    },
+    {
+        "id": "a048e042.97757",
+        "type": "template",
+        "z": "ab4c87ba.ff44c8",
+        "name": "css",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "css",
+        "syntax": "mustache",
+        "template": "#play-by-play {\n    width:50%;\n    margin: auto;\n}",
+        "output": "str",
+        "x": 390,
+        "y": 200,
+        "wires": [
+            [
+                "7889043b.607aec"
+            ]
+        ]
+    },
+    {
+        "id": "c5ad5743.a85ba8",
+        "type": "http in",
+        "z": "ab4c87ba.ff44c8",
+        "name": "",
+        "url": "/public/play-by-play.css",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 160,
+        "y": 200,
+        "wires": [
+            [
+                "a048e042.97757"
+            ]
+        ]
+    },
+    {
+        "id": "7889043b.607aec",
+        "type": "http response",
+        "z": "ab4c87ba.ff44c8",
+        "name": "",
+        "statusCode": "",
+        "headers": {
+            "Content-Type": "text/css"
+        },
+        "x": 610,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "aa89570.0e889a8",
+        "type": "http response",
+        "z": "ab4c87ba.ff44c8",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 990,
+        "y": 80,
+        "wires": []
+    }
+]
