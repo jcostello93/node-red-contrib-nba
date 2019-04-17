@@ -25,6 +25,16 @@ This project uses the [nba npm module](https://www.npmjs.com/package/nba) to cal
 
 There are a total of 5 nba nodes: 
 
+**database:** get player and team ids.
+
+**player:** get data in relation to a given player. 
+
+**team:** get data in relation to a given team.
+
+**league:** get leaguewide data.
+
+**game:** get data in relation to a given game.
+
 ## Database
 
 This node has the following uses: 
@@ -167,42 +177,53 @@ To test the game node:
 
 # Example flows 
 
-## Get all players. Download the flow. 
+## Get all players. Download the [flow](flows/get-all-players.json). 
 
 ![get-all-players-flow](screenshots/get-all-players-flow.png?raw=true "get-all-players-flow")
 
-## Develop an interactive website that displays a day's scoreboard. Download the flow. 
+## Develop an interactive website that displays a game day's scoreboard. Download the [flow](flows/scoreboard.json). 
 
 ![scoreboard-flow](screenshots/scoreboard-flow.png?raw=true "scoreboard-flow")
 
 ![scoreboard](screenshots/scoreboard.png?raw=true "scoreboard")
 
-## Develop an interactive website that displays the current year's standings.
+## Develop an interactive website that displays a team's best lineups. Download the [flow](flows/lineups.json). 
+
+![lineups-flow](screenshots/lineups-flow.png?raw=true "lineups-flow")
+
+![lineups](screenshots/lineups.png?raw=true "lineups")
+
+## Develop an interactive website that displays the current year's standings. Download the [flow](flows/standings.json).
 
 ![standings-flow](screenshots/standings-flow.png?raw=true "standings-flow")
 
 ![standings](screenshots/standings.png?raw=true "standings")
 
-## Display a game's box score. Download the flow. 
+## Display a game's box score. Download the [flow](flows/box-score.json). 
 
 ![box-score-flow](screenshots/box-score-flow.png?raw=true "box-score-flow")
 
 ![box-score](screenshots/box-score.png?raw=true "box-score")
 
-## Display a game's play-by-play. Download the flow. 
+## Display a game's play-by-play. Download the [flow](flows/play-by-play.json). 
 
 ![play-by-play-flow](screenshots/play-by-play-flow.png?raw=true "play-by-play-flow")
 
 ![play-by-play](screenshots/play-by-play.png?raw=true "play-by-play")
 
-
-## Develop an interactive website that displays a team's lineups. Download the flow. 
-
-## Create a Node-RED dashboard that displays the top 3pt shooters in the league. Download the flow. 
+## Create a Node-RED dashboard that displays the top 3pt shooters in the league. Download the [flow with JS](flows/fg3m-js.json) or the [flow without JS](flows/fg3m-nojs.json)
 
 ![fg3m-dashboard](screenshots/fg3m-dashboard.png?raw=true "fg3m-dashboard")
 
-## Download all website flows at once with a menu toolbar
+![fg3m-js-flow](screenshots/fg3m-js-flow.png?raw=true "fg3m-js-flow")
+
+![fg3m-nojs-flow](screenshots/fg3m-nojs-flow.png?raw=true "fg3m-nojs-flow")
+
+## Download [all website flows](flows/all-sites.json) at once with a menu toolbar
+
+![all-sites-flow](screenshots/all-sites-flow.png?raw=true "all-sites-flow")
+
+
 
 
 
