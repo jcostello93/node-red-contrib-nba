@@ -1,0 +1,327 @@
+[
+    {
+        "id": "73fbde55.3a406",
+        "type": "http in",
+        "z": "f397e3c.e0ad52",
+        "name": "",
+        "url": "/lineups",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 80,
+        "wires": [
+            [
+                "897eebea.105058"
+            ]
+        ]
+    },
+    {
+        "id": "8e382557.1ebe18",
+        "type": "template",
+        "z": "f397e3c.e0ad52",
+        "name": "HTML",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<head>\n    <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css\" integrity=\"sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T\" crossorigin=\"anonymous\">\n    <link rel=\"stylesheet\" type=\"text/css\" href=\"/public/{{css}}\">\n    \n    <script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js\"></script>\n</head>\n\n<body>\n    <div id=\"form-div\" class=\"form-group\">\n        <label for=\"team-select\">Team:</label>\n        <select id=\"team-select\" class=\"form-control\" onchange=\"selectTeam(event)\">\n            <option value=\"\" disabled selected>-- select a team --</option>\n            {{#payload}}\n                <option value=\"{{teamId}}\">{{teamName}}</option>\n            {{/payload}}\n        </select>\n        <label for=\"group-quantity\">Group quantity:</label>\n        <input type=\"number\" id=\"group-quantity\" class=\"form-control\" value=\"5\" min=\"1\" max=\"5\" onChange=\"updateResult(event)\">\n        <label for=\"season-type\">Season Type:</label>\n        <select id=\"season-type\" class=\"form-control\" onChange=\"selectTeam(event)\">\n            <option selected=\"selected\" value=\"Regular Season\">Regular Season</option>\n            <option value=\"Playoffs\">Playoffs</option>\n            <option value=\"Pre Season\">Preseason</option>\n            <option value=\"All Star\">All-Star</option>\n        </select>\n        <label for=\"minutes\">Minimum minutes:</label>\n        <input type=\"number\" id=\"minutes\" class=\"form-control\" value=\"1\" min=\"1\" oninput=\"changeMinutes(event)\">\n    </div>\n    \n            \n    <table class=\"table result-table\">\n        <thead>\n            <tr>\n                <th scope=\"col\">Group Name</th>\n                <th scope=\"col\">Min</th>\n                <th scope=\"col\">Net Rating</th>\n                <th scope=\"col\">Off Rating</th>\n                <th scope=\"col\">Def Rating</th>\n            </tr>\n        </thead>\n        <tbody id=\"tbody\">\n        </tbody>\n    </table>\n    \n    <ol class=\"list-inline\" id=\"player-select\">\n    </ol>\n    \n    <script type=\"text/javascript\" src=\"/public/{{script}}\"></script>\n</body>\n\n\n\n\n\n",
+        "output": "str",
+        "x": 790,
+        "y": 80,
+        "wires": [
+            [
+                "ebb260c9.2c118"
+            ]
+        ]
+    },
+    {
+        "id": "c3e1d47c.80c198",
+        "type": "http in",
+        "z": "f397e3c.e0ad52",
+        "name": "",
+        "url": "/lineups",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 160,
+        "wires": [
+            [
+                "29b00376.a3530c"
+            ]
+        ]
+    },
+    {
+        "id": "639c3a5d.283f14",
+        "type": "http response",
+        "z": "f397e3c.e0ad52",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 970,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "d31d44e6.eed878",
+        "type": "json",
+        "z": "f397e3c.e0ad52",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 770,
+        "y": 160,
+        "wires": [
+            [
+                "639c3a5d.283f14"
+            ]
+        ]
+    },
+    {
+        "id": "ff026a9f.079638",
+        "type": "http in",
+        "z": "f397e3c.e0ad52",
+        "name": "",
+        "url": "/players",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 240,
+        "wires": [
+            [
+                "d86b5fdb.75915"
+            ]
+        ]
+    },
+    {
+        "id": "cacfd1cd.d7033",
+        "type": "team",
+        "z": "f397e3c.e0ad52",
+        "name": "",
+        "team_id": "{{payload.team_id}}",
+        "team_type": "lineups",
+        "season": "2018-19",
+        "season_type": "Regular Season",
+        "measure_type": "Advanced",
+        "per_mode": "PerGame",
+        "group_quantity": "dynamic",
+        "player_team": "P",
+        "x": 590,
+        "y": 240,
+        "wires": [
+            [
+                "ec3b27fd.5305e8"
+            ]
+        ]
+    },
+    {
+        "id": "d86b5fdb.75915",
+        "type": "function",
+        "z": "f397e3c.e0ad52",
+        "name": "prepare msg props",
+        "func": "msg.topic = msg.req.body.players;\nmsg.group_quantity = msg.req.body.group_quantity; \nmsg.measure_type = msg.req.body.measure_type;\nmsg.minutes = msg.req.body.minutes; \nmsg.season_type = msg.req.body.season_type;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 350,
+        "y": 240,
+        "wires": [
+            [
+                "cacfd1cd.d7033"
+            ]
+        ]
+    },
+    {
+        "id": "ec3b27fd.5305e8",
+        "type": "function",
+        "z": "f397e3c.e0ad52",
+        "name": "filter lineups",
+        "func": "function allThere(groupId) {\n    var players = msg.topic; \n    for (var i = 0; i < players.length; i++) {\n        if (groupId.indexOf(players[i]) === -1){\n            return false;\n        }\n    }\n    return true; \n}\n\nvar lineup = [];\n\nfor (var i = 0; i < msg.payload.length; i++) {\n    var groupId = msg.payload[i].groupId;\n    if (allThere(groupId)) {\n        lineup.push(msg.payload[i])\n    }\n}\n\nmsg.payload = lineup; \n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 790,
+        "y": 240,
+        "wires": [
+            [
+                "9189154c.2165d8"
+            ]
+        ]
+    },
+    {
+        "id": "9189154c.2165d8",
+        "type": "http response",
+        "z": "f397e3c.e0ad52",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 970,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "897eebea.105058",
+        "type": "database",
+        "z": "f397e3c.e0ad52",
+        "name": "",
+        "database_type": "get data",
+        "get_type": "all teams",
+        "first_name": "",
+        "last_name": "",
+        "team_name": "",
+        "source": "name",
+        "object_id": "",
+        "x": 390,
+        "y": 80,
+        "wires": [
+            [
+                "18f38642.1b060a"
+            ]
+        ]
+    },
+    {
+        "id": "b124d5f8.620d38",
+        "type": "template",
+        "z": "f397e3c.e0ad52",
+        "name": "javascript",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "javascript",
+        "syntax": "mustache",
+        "template": "async function selectTeam(event) {\n    event.preventDefault();\n    emptyTable(); \n    var team_id = $(\"#team-select option:selected\").val();\n    var body = {\"team_id\": team_id};\n\n    var response = await fetch(\"/lineups\", {\n        \"method\": \"POST\",\n        \"body\": JSON.stringify(body),\n        \"headers\": {\n            \"Content-Type\": \"application/json\"\n            }\n        }\n    )\n        \n    var data = await response.json(); \n    addPlayersToSelect(data);\n}\n\nfunction addPlayersToSelect(data) {\n    $('#player-select').empty()\n    var roster = data.commonTeamRoster;\n    var player_select = document.getElementById(\"player-select\");\n    \n    roster.forEach((element, index, array) => {\n        var li = document.createElement(\"li\");\n        li.appendChild(document.createTextNode(element.player));\n        li.id = element.playerId;\n        li.className = \"list-group-item\"\n        li.addEventListener(\"click\", updateLineup)\n        player_select.appendChild(li);\n    });\n}\n\nfunction updateLineup(event) {\n    togglePlayer(event.target);\n    updateResult();\n}\n\nfunction togglePlayer(player_li){\n    if (player_li.className === \"list-group-item lineup-in\") {\n        player_li.className = \"list-group-item lineup-out\";\n    } else {\n        player_li.className = \"list-group-item lineup-in\";\n    }\n}\n\nfunction getActiveLineup() {\n    var lineup_html = document.getElementsByClassName(\"lineup-in\");\n    var lineup_arr = Array.from(lineup_html);\n    var players = [];\n    lineup_arr.forEach((element, index, array) => {\n        players.push(element.id);\n    });\n    return players;\n}\n\n\nasync function updateResult() {\n    var players = getActiveLineup(); \n    \n    var MIN_LINEUP_LENGTH = 0; \n    var MAX_LINEUP_LENGTH = 5; \n    \n    if (players.length < MIN_LINEUP_LENGTH || players.length > MAX_LINEUP_LENGTH) {\n        return; \n    }\n\n    var group_quantity = document.getElementById(\"group-quantity\").value;\n    var minutes = document.getElementById(\"minutes\").value;\n    var season_type = $(\"#season-type option:selected\").val();\n    var team_id = $(\"#team-select option:selected\").val();\n\n    var body = {\n        \"players\": players, \n        \"team_id\": team_id,\n        \"group_quantity\": group_quantity,\n        \"season_type\": season_type,\n        \"minutes\": minutes\n    };\n    var response = await fetch(\"/players\", {\n        \"method\": \"POST\",\n        \"body\": JSON.stringify(body),\n        \"headers\": {\n            \"Content-Type\": \"application/json\"\n            }\n        })\n    var data = await response.json();\n    addLineupsToResult(data);\n    changeMinutes();\n    \n}\n\nfunction removeChildren(elem) {\n    while (elem.firstChild) {\n        elem.removeChild(elem.firstChild);\n    }\n}\n\nfunction emptyTable() {\n    var tbody = document.getElementById(\"tbody\");\n    removeChildren(tbody);\n}\n\nfunction changeMinutes(event) {\n    var minutes = parseInt(document.getElementById(\"minutes\").value);\n    var tbody = document.getElementById(\"tbody\");\n    var rows = tbody.rows;\n    for (var i = 0; i < rows.length; i++) {\n        var cells = rows[i].cells;\n        if (minutes > parseInt(cells[1].innerText)) {\n            rows[i].style.display = \"none\";\n        } else {\n            rows[i].style.display = \"table-row\";\n        }\n    }\n    \n}\n\nfunction addLineupsToResult(data) {\n    \n    data.sort((a, b) => parseFloat(b.netRating) - parseFloat(a.netRating));\n    emptyTable();\n    var tbody = document.getElementById(\"tbody\")\n\n    data.forEach((element, index, array) => {\n       var tr = tbody.insertRow();\n       var td = tr.insertCell()\n       td.innerHTML = element.groupName;\n       \n       td = tr.insertCell()\n       td.innerHTML = element.min;\n       \n       td = tr.insertCell()\n       td.innerHTML = element.netRating;\n       \n       td = tr.insertCell()\n       td.innerHTML = element.offRating;\n       \n       td = tr.insertCell()\n       td.innerHTML = element.defRating;\n    });\n}\n\n",
+        "output": "str",
+        "x": 440,
+        "y": 360,
+        "wires": [
+            [
+                "8ba54d13.11bf2"
+            ]
+        ]
+    },
+    {
+        "id": "b3cf2b8d.bcbb88",
+        "type": "http in",
+        "z": "f397e3c.e0ad52",
+        "name": "",
+        "url": "/public/lineups.js",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 160,
+        "y": 360,
+        "wires": [
+            [
+                "b124d5f8.620d38"
+            ]
+        ]
+    },
+    {
+        "id": "8ba54d13.11bf2",
+        "type": "http response",
+        "z": "f397e3c.e0ad52",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 670,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "18f38642.1b060a",
+        "type": "function",
+        "z": "f397e3c.e0ad52",
+        "name": "set scripts",
+        "func": "msg.script = \"lineups.js\";\nmsg.css = \"lineups.css\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 600,
+        "y": 80,
+        "wires": [
+            [
+                "8e382557.1ebe18"
+            ]
+        ]
+    },
+    {
+        "id": "29b00376.a3530c",
+        "type": "team",
+        "z": "f397e3c.e0ad52",
+        "name": "",
+        "team_id": "{{payload.team_id}}",
+        "team_type": "roster",
+        "season": "2018-19",
+        "season_type": "Regular Season",
+        "measure_type": "Base",
+        "per_mode": "PerGame",
+        "group_quantity": "5",
+        "player_team": "P",
+        "x": 450,
+        "y": 160,
+        "wires": [
+            [
+                "d31d44e6.eed878"
+            ]
+        ]
+    },
+    {
+        "id": "833dc765.797828",
+        "type": "template",
+        "z": "f397e3c.e0ad52",
+        "name": "CSS",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "css",
+        "syntax": "mustache",
+        "template": "label {\n    font-weight: bold;\n}\n\n.lineup-in {\n    background-color: lightgreen;\n}\n\n.lineup-in {\n    background-color: none;\n}\n\n\n#player-select {\n    width: 25%;\n    margin-left: 2.5%;\n}\n\n\n#form-div {\n    width: 25%;\n    margin-left: 2.5%;\n    margin-top: 2%;\n}\n\n\n.result-table {\n    width: 60%;\n    position: absolute;\n    top: 5%;\n    right: 5%;\n}\n\n.list-group-item {\n    overflow: hidden;\n}",
+        "output": "str",
+        "x": 430,
+        "y": 420,
+        "wires": [
+            [
+                "451aea00.989ea8"
+            ]
+        ]
+    },
+    {
+        "id": "39c9af27.4eb2f",
+        "type": "http in",
+        "z": "f397e3c.e0ad52",
+        "name": "",
+        "url": "/public/lineups.css",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 160,
+        "y": 420,
+        "wires": [
+            [
+                "833dc765.797828"
+            ]
+        ]
+    },
+    {
+        "id": "451aea00.989ea8",
+        "type": "http response",
+        "z": "f397e3c.e0ad52",
+        "name": "",
+        "statusCode": "",
+        "headers": {
+            "Content-Type": "text/css"
+        },
+        "x": 670,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "ebb260c9.2c118",
+        "type": "http response",
+        "z": "f397e3c.e0ad52",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 970,
+        "y": 80,
+        "wires": []
+    }
+]
