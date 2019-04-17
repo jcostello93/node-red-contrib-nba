@@ -1,12 +1,30 @@
 {
   "name": "node-red-contrib-nba",
   "version": "1.0.0",
+  "author" : {
+    "name": "John Costello",
+    "email": "jcostello93@gmail.com"
+  },
+  "contributors": [
+    {
+      "name": "John Costello",
+      "url": "https://github.com/jcostello93"
+    }
+  ],
   "description": "Access the NBA Stats API with Node-RED",
   "main": "nba.js",
   "dependencies": {
     "mocha": "^6.0.2",
     "mustache": "^3.0.1",
     "nba": "^4.5.0"
+  },
+  "keywords": [
+    "node-red",
+    "nba"
+  ], 
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jcostello93/node-red-contrib-nba.git"
   },
   "scripts": {
     "test": "mocha --timeout 10000 \"test/**/*_spec.js\"",
@@ -16,8 +34,7 @@
     "test-game": "mocha --timeout 10000 test/game_spec.js",
     "test-database": "mocha --timeout 10000 test/database_spec.js"
   },
-  "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "node-red": {
     "nodes": {
       "nba": "nba.js"
