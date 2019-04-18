@@ -1,0 +1,40 @@
+[
+    {
+        "id": "24b1c653.ca1e4a",
+        "type": "inject",
+        "z": "bd5d3ecc.6091",
+        "name": "repeat every day at 12:00",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "00 12 * * *",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 240,
+        "y": 60,
+        "wires": [
+            [
+                "7f732863.1e9278"
+            ]
+        ]
+    },
+    {
+        "id": "7f732863.1e9278",
+        "type": "database",
+        "z": "bd5d3ecc.6091",
+        "name": "",
+        "database_type": "update",
+        "get_type": "all players",
+        "first_name": "",
+        "last_name": "",
+        "team_name": "",
+        "source": "name",
+        "object_id": "",
+        "x": 590,
+        "y": 60,
+        "wires": [
+            []
+        ]
+    }
+]

@@ -102,7 +102,7 @@ The get a game id, use the league node to get a scoreboard for a given game day.
 
 ## Valid Parameters
 
-The nodes dynamically load dropdown options from the [nba.json](https://github.com/bttmly/nba-client-template/blob/master/nba.json) file in the [nba-client-template npm module](https://www.npmjs.com/package/nba-client-template). 
+The nodes dynamically load dropdown options from the [nba.json](https://github.com/bttmly/nba-client-template/blob/master/nba.json) file in the [nba-client-template npm module](https://www.npmjs.com/package/nba-client-template). If you load inputs dynamically, please refer either to this file or the dropdown options. If you send an invalid parameter value, then you should receive an error from the NBA API explicitly saying what it accepts for the particular endpoint. 
 
 ## Dynamically loading inputs
 
@@ -110,7 +110,7 @@ Most of the node inputs can be dynamically loaded. There are two ways to do this
 
 ### Text fields
 
-**Text fields** may be hardcoded or dynamically populated via mustache syntax relative to the incoming msg object. For example, if the season is located in <code>msg.payload.season</code>, then you can fill <code>{{payload.season}}</code> in the season field.
+**Text fields** may be hardcoded or dynamically populated via mustache syntax relative to the incoming msg object. For example, if the player id is located in <code>msg.payload.playerId</code>, then you can fill <code>{{payload.playerId}}</code> in the id field.
 
 A simple example is using the database node to get a team by name and then sending the response to a team node. Because the database node returns a team object in <code>msg.payload</code> with the team id in <code>msg.payload.teamId</code>, you can now fill in <code>{{payload.teamId}}</code> in the team id field of the team node. 
 
@@ -121,7 +121,7 @@ A simple example is using the database node to get a team by name and then sendi
 
 ### Dropdown options
 
-**Dropdown fields** may be selected from the menu or dynamically populated via the specified property of the incoming msg object. For example, if loading measure type dynamically, the dropdown menu designates <code>msg.measure_type</code> as the specified property. When using this open, the property must be set earlier in the flow. 
+**Dropdown fields** may be selected from the menu or dynamically populated via the specified property of the incoming msg object. For example, if loading measure type dynamically, the dropdown menu designates <code>msg.measure_type</code> as the specified property. When using this option, the property must be set earlier in the flow. 
 
 ![dynamic-dropdown](screenshots/dynamic-dropdown.png?raw=true "dynamic-dropdown")
 
@@ -180,6 +180,10 @@ To test the game node:
 ## Get all players. Download the [flow](flows/get-all-players.json). 
 
 ![get-all-players-flow](screenshots/get-all-players-flow.png?raw=true "get-all-players-flow")
+
+## Schedule a daily database update to get the latest player and team info. Download the [flow](flows/update-database.json). 
+
+![update-database-flow](screenshots/update-database-flow.png?raw=true "update-database-flow")
 
 ## Develop an interactive website that displays a game day's scoreboard. Download the [flow](flows/scoreboard.json). 
 
