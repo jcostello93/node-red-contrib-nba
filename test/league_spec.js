@@ -556,6 +556,26 @@ describe('League node: ', function () {
         });
       });    
 
+      it('league schedule', function (done) {
+        var flow = [
+          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "schedule", season: "2018-19"},
+          { id: "n2", type: "helper" }
+        ];
+        helper.load(nbaNode, flow, function () {
+          var n2 = helper.getNode("n2");
+          var n1 = helper.getNode("n1");
+          n2.on("input", function (msg) {
+            msg.should.have.property("payload");
+            msg.payload.should.have.property("lscd");
+            msg.payload.lscd[0].should.have.property("mscd")
+            msg.payload.lscd[0].mscd.should.have.property("g")
+            msg.payload.lscd[0].mscd.g[0].should.have.property("gid")
+            done();
+          });
+          n1.receive({ payload: ""});
+        });
+      });
+
     afterEach(function (done) {
         helper.unload();
         helper.stopServer(done);

@@ -16,8 +16,7 @@
   "dependencies": {
     "mocha": "^6.1.4",
     "mustache": "^3.0.1",
-    "nba": "^4.6.0",
-    "node-fetch": "^2.3.0"
+    "nba": "^4.7.0"
   },
   "keywords": [
     "node-red",
