@@ -84,7 +84,20 @@
                 return this.name || "update database";
             }
         },
-        oneditprepare: oneditprepare
+        oneditprepare: oneditprepare,
+        oneditsave: function() {
+            var trim_fields = [
+                "first_name",
+                "last_name",
+                "team_name"
+            ]
+
+            trim_fields.forEach((field) => {
+                var value = $("#node-input-"+field).val();
+                value = value.trim(); 
+                $("#node-input-"+field).val(value);
+            })
+        }
     });
 </script>
 
@@ -478,6 +491,8 @@
                 $("#node-action-per_mode").show();
             } else if (team_type === "roster") {
                 $("#node-action-season").show();
+            } else if (team_type === "schedule") {
+                $("#node-action-season").show();
             } else if (team_type === "lineups") {
                 $("#node-action-season").show();
                 $("#node-action-season_type").show();
@@ -544,6 +559,7 @@
         <select type="text" id="node-input-team_type" style="display: inline-block; width: 250px; vertical-align: top;">
             <option value="profile" outputs="1">profile</option>
             <option value="roster" outputs="1">roster</option>
+            <option value="schedule" outputs="1">schedule</option>
             <option value="stats" outputs="1">stats</option>
             <option value="shooting" outputs="1">shooting</option>
             <option value="splits" outputs="1">splits</option>            
@@ -687,7 +703,7 @@
         }
 
         function setDefaultOption(default_param, select, select_val, prop) {
-            if (select_val === "") {
+            if (!select_val || select_val.trim() === "") {
                 select.value = default_param;
                 this[prop] = default_param; 
             } else {
@@ -801,6 +817,8 @@
                 $("#node-action-per_mode").show();
                 $("#node-action-player_team").show();
                 $("#node-action-pt_measure_type").show();
+            } else if (league_type === "schedule") {
+                $("#node-action-season").show();
             }
         }
 
@@ -862,6 +880,7 @@
             <option value="hustle" outputs="1">hustle</option>
             <option value="clutch" outputs="1">clutch</option>
             <option value="lineups" outputs="1">lineups</option>
+            <option value="schedule" outputs="1">schedule</option>
         </select>
     </div>
     <div class="form-row" id="node-action-season_type"> 
@@ -1004,13 +1023,53 @@
 
 <!-- START Game -->
 <script type="text/javascript">
+    function oneditprepare() {
+        $("#node-input-game_type").change(function() {
+            hideExtraActions()
+            showActions()
+        });
+
+        $("#node-input-live").change(function() {
+            hideExtraActions()
+            showActions()
+        });
+
+        hideExtraActions()
+        showActions()
+
+    }
+
+    function hideExtraActions(){
+        $("#node-action-game_date").hide();
+        $("#node-action-live").hide();
+    }
+
+    function showActions() {
+        var game_type = $("#node-input-game_type option:selected").val();
+        var live = $("#node-input-live option:selected").val();
+        if (game_type === "box score") {
+            $("#node-action-live").show();
+            if (live === "true") {
+                $("#node-action-game_date").show();
+            }
+        } else if (game_type === "play-by-play") {
+            $("#node-action-live").show();
+            if (live === "true") {
+                $("#node-action-game_date").show();
+            }
+        }
+    }
+
+
     RED.nodes.registerType('game',{
         category: 'nba',
         color: '#a6bbcf',
         defaults: {
             name: {value:""},
             game_id: {value:""},
-            game_type: {value:"box score"}
+            game_type: {value:"box score"},
+            game_date: {value:""},
+            live: {value:"false"}
         },
         icon: "nba_icon.png",
         inputs:1,
@@ -1019,7 +1078,8 @@
         color:"#A2B2D0",
         label: function() {
             return this.name||"game " + this.game_type;
-        }
+        },
+        oneditprepare: oneditprepare
     });
 </script>
 
@@ -1036,9 +1096,21 @@
             <option value="shot chart" outputs="1">shot chart</option>
         </select>
     </div>
+    <div class="form-row" id="node-action-live"> 
+        <label for="node-input-live"><i class="fa fa-wrench"></i> live</label>
+        <select type="text" id="node-input-live" style="display: inline-block; width: 250px; vertical-align: top;">
+            <option value="true" outputs="1">True</option>
+            <option value="false" outputs="1">False</option>
+            <option value="dynamic" outputs="1">load from msg.live</option>
+        </select>
+    </div>
     <div class="form-row" id="node-action-game_id">
         <label for="node-input-game_id"><i class="icon-tag"></i> game_id</label>
         <input type="text" id="node-input-game_id" placeholder="game_id">
+    </div>
+    <div class="form-row" id="node-action-game_date">
+        <label for="node-input-game_date"><i class="icon-tag"></i> game date</label>
+        <input type="text" id="node-input-game_date" placeholder="YYYY-MM-DD">
     </div>
 </script>
 
@@ -1079,59 +1151,3 @@
 
 </script>
 <!-- END Game -->
-
-<!-- START Update
-<script type="text/javascript">
-    RED.nodes.registerType('update',{
-        category: 'nba',
-        color: '#a6bbcf',
-        defaults: {
-            name: {value:""}
-        },
-        inputs:1,
-        outputs:1,
-        align: "left",
-        color:"#A2B2D0",
-        label: function() {
-            return this.name || "update database";
-        }
-    });
-</script>
-
-<script type="text/x-red" data-template-name="update">
-    <div class="form-row">
-        <label for="node-input-name"><i class="icon-tag"></i> name</label>
-        <input type="text" id="node-input-name" placeholder="name">
-    </div>
-</script>
-
-<script type="text/x-red" data-help-name="update">
-    <p>Get the most up-to-date player information from the NBA Stats API.</p>
-    
-    <h3>Outputs</h3>
-    <ol class="node-ports">
-        <li> 
-            <dl class="message-properties">
-            <dt>payload <span class="property-type">object | array</span></dt>
-            <dd> </dd>
-            </dl>
-        </li>
-        <li>Standard error
-            <dl class="message-properties">
-            <dt>payload <span class="property-type">string</span></dt>
-            <dd>the standard error of the command.</dd>
-            </dl>
-        </li>
-    </ol>
-
-    <h3>Details</h3>
-    <p>Use this node to get access to the players and teams in the NBA, as well as their unique id's.</p>
-    <p>The id's refer to the unique id's used by the NBA Stats API. They are sometimes required by the other NBA nodes.</p>
-    <p>This particular node doesn't query the NBA API. Instead, it searches JSON files.</p>
-
-    <h3>References</h3>
-    <ul>
-        <li><a href='https://www.npmjs.com/package/nba'>NBA npm module</a> - further details regarding the API endpoints.</li>
-    </ul>
-</script>
-END Update -->
