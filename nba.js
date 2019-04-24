@@ -4,8 +4,28 @@ module.exports = function(RED) {
 	NBA.updatePlayers();
 	var mustache = require("mustache");
 	var NBA_CLIENT = require("nba-client-template");	
+	var fetch = require("node-fetch");
+
+	addMissingDefaultValues(); 
+
+	function getParamObject(param_name) {
+		return NBA_CLIENT.parameters.find(param => param.name === param_name);
+	}
+
+	function addMissingDefaultValues() {
+		var params = [ 
+			getParamObject("ClutchTime"), 
+			getParamObject("AheadBehind"), 
+			getParamObject("PtMeasureType"), 
+			getParamObject("StatCategory")
+		];
+		params.forEach((param) => {
+			param.default = param.values[0]; 
+		})
+	}
 
 	// In order of priority: 1. HTML text OR mustache syntax, 2. msg.msgProp 
+	// TO DO: trim here?
 	function parseField(msg, nodeProp, msgProp) {
 		var field;
 		var isTemplatedField = (nodeProp||"").indexOf("{{") != -1
@@ -121,6 +141,7 @@ module.exports = function(RED) {
 			"profile":NBA.stats.teamInfoCommon,
 			"stats": NBA.stats.teamStats,
 			"roster": NBA.stats.commonTeamRoster,
+			"schedule": getTeamSchedule,
 			"lineups": NBA.stats.lineups,
 			"player_shooting": NBA.stats.playerShooting,
 			"team_shooting": NBA.stats.teamShooting,
@@ -154,6 +175,7 @@ module.exports = function(RED) {
 			"profile": {TeamID: props.team_id},
 			"stats": {TeamID: props.team_id, Season: props.season, SeasonType: props.season_type},
 			"roster": {TeamID: props.team_id, Season: props.season},
+			"schedule": {team_id: props.team_id, season: props.season},
 			"lineups": {TeamID: props.team_id, Season: props.season, SeasonType: props.season_type, PerMode: props.per_mode, MeasureType: props.measure_type, GroupQuantity: props.group_quantity},
 			"player_shooting": {TeamID: props.team_id, Season: props.season, SeasonType: props.season_type, PerMode: props.per_mode},
 			"team_shooting": {TeamID: props.team_id, Season: props.season, SeasonType: props.season_type, PerMode: props.per_mode},
@@ -176,7 +198,8 @@ module.exports = function(RED) {
 			"team_hustle": NBA.stats.teamHustle,
 			"player_clutch": NBA.stats.playerClutch,
 			"team_clutch": NBA.stats.teamClutch,
-			"lineups": NBA.stats.lineups
+			"lineups": NBA.stats.lineups,
+			"schedule": getLeagueSchedule
 		}
 		return method_dict; 
 	}
@@ -226,7 +249,8 @@ module.exports = function(RED) {
 			"team_hustle": {Season: props.season, SeasonType: props.season_type, PerMode: props.per_mode},
 			"player_clutch": {Season: props.season, SeasonType: props.season_type, PerMode: props.per_mode, AheadBehind: props.ahead_behind, ClutchTime: props.clutch_time, PointDiff: props.point_diff},
 			"team_clutch": {Season: props.season, SeasonType: props.season_type, PerMode: props.per_mode, AheadBehind: props.ahead_behind, ClutchTime: props.clutch_time, PointDiff: props.point_diff},
-			"lineups": {Season: props.season, SeasonType: props.season_type, PerMode: props.per_mode, MeasureType: props.measure_type, GroupQuantity: props.group_quantity}
+			"lineups": {Season: props.season, SeasonType: props.season_type, PerMode: props.per_mode, MeasureType: props.measure_type, GroupQuantity: props.group_quantity},
+			"schedule": {season: props.season}
 		}
 		return params_dict; 
 	}
@@ -234,8 +258,10 @@ module.exports = function(RED) {
 	function getGameMethodDict() {
 		var method_dict = {
 			"play-by-play": NBA.stats.playByPlay,
+			"play-by-play live": playByPlayLive,
 			"shot chart": NBA.stats.shots,
-			"box score": boxScorePromise
+			"box score": boxScorePromise,
+			"box score live": boxScoreLive
 		}
 		return method_dict; 
 	}
@@ -244,14 +270,28 @@ module.exports = function(RED) {
 		var props = {}; 
 		props.game_type = parseField(msg, n.game_type);
 		props.game_id = parseField(msg, n.game_id);
+		props.live = parseField(msg, n.live, "live");
+		props.game_date = parseField(msg, n.game_date); 
+		
+		if (props.game_type === "box score" && props.live === "true") {
+			props.game_type = "box score live";
+		}
+
+		if (props.game_type === "play-by-play" && props.live === "true") {
+			props.game_type = "play-by-play live";
+		}
+
 		return props; 
 	}
 
 	function getGameParamsDict(props) {
+		// "box score live": {game_date: props.game_date, game_id: props.game_id}
 		var params_dict = {
 			"play-by-play": {GameID: props.game_id},
+			"play-by-play live": {game_date: props.game_date, game_id: props.game_id},
 			"shot chart": {GameID: props.game_id},
-			"box score": {GameID: props.game_id}
+			"box score": {GameID: props.game_id},
+			"box score live": {game_date: props.game_date, game_id: props.game_id}
 		}
 		return params_dict; 
 	}
@@ -422,6 +462,52 @@ module.exports = function(RED) {
 		});        
 	}
 	RED.nodes.registerType("player",PlayerNode);
+
+	function getTeamSchedule(params) {
+		return new Promise((resolve, reject) => {
+			fetch("http://data.nba.com/data/10s/v2015/json/mobile_teams/nba/" + params.season.substring(0, 4) + "/league/00_full_schedule.json")
+			.then(res => res.json())
+			.then(body => {
+				var schedule = []; 
+				body.lscd.forEach((element, i) => {
+					element.mscd.g.forEach((game, j) => {
+						if (game.h.tid === params.team_id || game.v.tid === params.team_id) {
+							schedule.push(game); 
+						}
+					})
+				})
+				resolve(schedule);
+			})
+			.catch (err => { reject(err); })
+		})
+	}
+
+	function boxScoreLive(params) {
+		return new Promise((resolve, reject) => {
+			var game_date = params.game_date.replace(/-/g, "").replace(/\//g, '');
+			NBA.data.boxScore(game_date, params.game_id)
+			.then(body => { resolve(body); })
+			.catch (err => { reject(err); })
+		})
+	}
+
+	function playByPlayLive(params) {
+		return new Promise((resolve, reject) => {
+			var game_date = params.game_date.replace(/-/g, "").replace(/\//g, '');
+			NBA.data.playByPlay(game_date, params.game_id)
+			.then(body => { resolve(body); })
+			.catch (err => { reject(err); })
+		})
+	}
+
+	function getLeagueSchedule(params) {
+		return new Promise((resolve, reject) => {
+			fetch("http://data.nba.com/data/10s/v2015/json/mobile_teams/nba/" + params.season.substring(0, 4) + "/league/00_full_schedule.json")
+			.then(res => res.json())
+			.then(body => { resolve(body); })
+			.catch (err => { reject(err); })
+		})
+	}
 	
 	function TeamNode(n) {
 		RED.nodes.createNode(this,n);
