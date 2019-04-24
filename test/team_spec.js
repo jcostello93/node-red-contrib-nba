@@ -301,6 +301,23 @@ describe('Team node: ', function () {
         });
       });
 
+      it('team schedule', function (done) {
+        var flow = [
+          { id: "n1", type: "team", name: "team", wires:[["n2"]], team_type: "schedule", team_id: "1610612752", season: "2018-19"},
+          { id: "n2", type: "helper" }
+        ];
+        helper.load(nbaNode, flow, function () {
+          var n2 = helper.getNode("n2");
+          var n1 = helper.getNode("n1");
+          n2.on("input", function (msg) {
+            msg.should.have.property("payload");
+            msg.payload[0].should.have.property("gid");
+            done();
+          });
+          n1.receive({ payload: ""});
+        });
+      });
+
     
 
     afterEach(function (done) {

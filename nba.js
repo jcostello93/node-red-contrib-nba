@@ -1,10 +1,9 @@
 module.exports = function(RED) {
     "use strict";
 	var NBA = require("nba");
-	NBA.updatePlayers();
+	// NBA.updatePlayers();
 	var mustache = require("mustache");
 	var NBA_CLIENT = require("nba-client-template");	
-	var fetch = require("node-fetch");
 
 	addMissingDefaultValues(); 
 
@@ -465,9 +464,8 @@ module.exports = function(RED) {
 
 	function getTeamSchedule(params) {
 		return new Promise((resolve, reject) => {
-			fetch("http://data.nba.com/data/10s/v2015/json/mobile_teams/nba/" + params.season.substring(0, 4) + "/league/00_full_schedule.json")
-			.then(res => res.json())
-			.then(body => {
+			NBA.data.schedule(params.season.substring(0, 4))
+			.then(body => { 
 				var schedule = []; 
 				body.lscd.forEach((element, i) => {
 					element.mscd.g.forEach((game, j) => {
@@ -477,7 +475,7 @@ module.exports = function(RED) {
 					})
 				})
 				resolve(schedule);
-			})
+			 })
 			.catch (err => { reject(err); })
 		})
 	}
@@ -502,8 +500,7 @@ module.exports = function(RED) {
 
 	function getLeagueSchedule(params) {
 		return new Promise((resolve, reject) => {
-			fetch("http://data.nba.com/data/10s/v2015/json/mobile_teams/nba/" + params.season.substring(0, 4) + "/league/00_full_schedule.json")
-			.then(res => res.json())
+			NBA.data.schedule(params.season.substring(0, 4))
 			.then(body => { resolve(body); })
 			.catch (err => { reject(err); })
 		})
