@@ -34,7 +34,7 @@ function getLeagueNodeProps() {
         "season_type",
         "stat_category",
         "sorter",
-        "player_team",
+        "player_or_team",
         "ahead_behind",
         "point_diff",
         "clutch_time",
@@ -52,25 +52,24 @@ function getLeagueNodeProps() {
 function getLeagueProps(n, msg) {
     var props = {};
 
-    var node_props = getLeagueNodeProps(); 
-    
+    var node_props = getLeagueNodeProps();     
 
     node_props.forEach((prop) => {  
         props[prop] = parseField(msg, n[prop], prop)
     })
 
-    props.player_team = playerTeamHelper(props.player_team);  
+    props.player_or_team = playerTeamHelper(props.player_or_team);  
 
     // There are 2 different endpoints for player and team, as opposed to a single endpoint with a PlayerOrTeam parameter 
     if (props.league_type === "shooting") {
-        props.league_type = (props.player_team === "P") ? "player_shooting" : "team_shooting";
+        props.league_type = (props.player_or_team === "P") ? "player_shooting" : "team_shooting";
     } else if (props.league_type === "hustle") {
-        props.league_type = (props.player_team === "P") ? "player_hustle" : "team_hustle";
+        props.league_type = (props.player_or_team === "P") ? "player_hustle" : "team_hustle";
     } else if (props.league_type === "clutch") {
-        props.league_type = (props.player_team === "P") ? "player_clutch" : "team_clutch";
+        props.league_type = (props.player_or_team === "P") ? "player_clutch" : "team_clutch";
     } else if (props.league_type === "player tracking") {
         // This particular endpoint wants "Player"/"Team" instead of "P"/"T" https://github.com/bttmly/nba-client-template/blob/master/nba.json
-        props.player_team = (props.player_team === "P") ? "Player" : "Team";
+        props.player_or_team = (props.player_or_team === "P") ? "Player" : "Team";
     } 
 
     return props; 
@@ -81,8 +80,8 @@ function getLeagueParamsDict(props) {
         "scoreboard": {gameDate: props.game_date},
         "leaders": {Season: props.season, SeasonType: props.season_type, PerMode: props.per_mode, StatCategory: props.stat_category},
         "standings": {Season: props.season, SeasonType: props.season_type},
-        "game log": {PlayerOrTeam: props.player_team, Season: props.season, SeasonType: props.season_type, Sorter: props.sorter},
-        "player tracking": {PlayerOrTeam: props.player_team, Season: props.season, SeasonType: props.season_type, PtMeasureType: props.pt_measure_type, PerMode: props.per_mode},
+        "game log": {PlayerOrTeam: props.player_or_team, Season: props.season, SeasonType: props.season_type, Sorter: props.sorter},
+        "player tracking": {PlayerOrTeam: props.player_or_team, Season: props.season, SeasonType: props.season_type, PtMeasureType: props.pt_measure_type, PerMode: props.per_mode},
         "player_shooting": {Season: props.season, SeasonType: props.season_type, PerMode: props.per_mode, CloseDefDistRange: props.close_def_dist_range, DribbleRange: props.dribble_range, TouchTimeRange: props.touch_time_range, ShotClockRange: props.shot_clock_range, GeneralRange: props.general_range},
         "team_shooting": {Season: props.season, SeasonType: props.season_type, PerMode: props.per_mode, CloseDefDistRange: props.close_def_dist_range, DribbleRange: props.dribble_range, TouchTimeRange: props.touch_time_range, ShotClockRange: props.shot_clock_range, GeneralRange: props.general_range},
         "player_hustle": {Season: props.season, SeasonType: props.season_type, PerMode: props.per_mode},
