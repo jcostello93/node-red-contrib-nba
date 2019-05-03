@@ -52,6 +52,11 @@ function getParamObject(param_name) {
     return NBA_CLIENT.parameters.find(param => param.name === param_name);
 }
 
+function addGroupQuantityValues() {
+    var param = getParamObject("GroupQuantity");
+    param.values = [2, 3, 4, 5];
+}
+
 function addMissingParamDefaultValues() {
     var params = [ 
         getParamObject("ClutchTime"), 
@@ -69,5 +74,6 @@ module.exports = {
     convertData,
     cleanData,
     addMissingParamDefaultValues,
-    playerTeamHelper
+    playerTeamHelper,
+    addGroupQuantityValues
 }

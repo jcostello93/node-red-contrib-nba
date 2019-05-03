@@ -198,7 +198,7 @@ describe('League node: ', function () {
 
     it('league game log by player', function (done) {
       var flow = [
-        { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "game log", season_type: "Regular Season", season: "2018-19", sorter: "PTS", player_team: "P"},
+        { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "game log", season_type: "Regular Season", season: "2018-19", sorter: "PTS", player_or_team: "P"},
         { id: "n2", type: "helper" }
       ];
       helper.load(nbaNode, flow, function () {
@@ -220,7 +220,7 @@ describe('League node: ', function () {
 
     it('(node) sorter load from msg.sorter', function (done) {
         var flow = [
-          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "game log", season_type: "Regular Season", season: "2018-19", sorter: "dynamic", player_team: "P"},
+          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "game log", season_type: "Regular Season", season: "2018-19", sorter: "dynamic", player_or_team: "P"},
           { id: "n2", type: "helper" }
         ];
         helper.load(nbaNode, flow, function () {
@@ -242,7 +242,7 @@ describe('League node: ', function () {
 
       it('league game log by team', function (done) {
         var flow = [
-          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "game log", season_type: "Regular Season", season: "2018-19", sorter: "PTS", player_team: "T"},
+          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "game log", season_type: "Regular Season", season: "2018-19", sorter: "PTS", player_or_team: "T"},
           { id: "n2", type: "helper" }
         ];
         helper.load(nbaNode, flow, function () {
@@ -264,7 +264,7 @@ describe('League node: ', function () {
 
     it('league player tracking by player', function (done) {
         var flow = [
-          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "player tracking", season_type: "Regular Season", per_mode: "PerGame", pt_measure_type: "CatchShoot", season: "2018-19",  player_team: "P"},
+          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "player tracking", season_type: "Regular Season", per_mode: "PerGame", pt_measure_type: "CatchShoot", season: "2018-19",  player_or_team: "P"},
           { id: "n2", type: "helper" }
         ];
         helper.load(nbaNode, flow, function () {
@@ -282,7 +282,7 @@ describe('League node: ', function () {
 
     it('league player tracking by team', function (done) {
         var flow = [
-          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "player tracking", season_type: "Regular Season", per_mode: "PerGame", pt_measure_type: "CatchShoot", season: "2018-19",  player_team: "T"},
+          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "player tracking", season_type: "Regular Season", per_mode: "PerGame", pt_measure_type: "CatchShoot", season: "2018-19",  player_or_team: "T"},
           { id: "n2", type: "helper" }
         ];
         helper.load(nbaNode, flow, function () {
@@ -300,7 +300,7 @@ describe('League node: ', function () {
 
     it('(node) pt_measure_type load from msg.pt_measure_type', function (done) {
         var flow = [
-          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "player tracking", season_type: "Regular Season", per_mode: "PerGame", pt_measure_type: "dynamic", season: "2018-19",  player_team: "T"},
+          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "player tracking", season_type: "Regular Season", per_mode: "PerGame", pt_measure_type: "dynamic", season: "2018-19",  player_or_team: "T"},
           { id: "n2", type: "helper" }
         ];
         helper.load(nbaNode, flow, function () {
@@ -318,7 +318,7 @@ describe('League node: ', function () {
 
     it('league shooting by player', function (done) {
         var flow = [
-          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "shooting", season_type: "Regular Season", per_mode: "PerGame",  season: "2018-19",  player_team: "P"},
+          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "shooting", season_type: "Regular Season", per_mode: "PerGame",  season: "2018-19",  player_or_team: "P"},
           { id: "n2", type: "helper" }
         ];
         helper.load(nbaNode, flow, function () {
@@ -334,9 +334,9 @@ describe('League node: ', function () {
         });
       });
 
-      it('(node) player_team load from msg.player_team', function (done) {
+      it('(node) player_or_team load from msg.player_or_team', function (done) {
         var flow = [
-          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "shooting", season_type: "Regular Season", per_mode: "PerGame",  season: "2018-19",  player_team: "dynamic"},
+          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "shooting", season_type: "Regular Season", per_mode: "PerGame",  season: "2018-19",  player_or_team: "dynamic"},
           { id: "n2", type: "helper" }
         ];
         helper.load(nbaNode, flow, function () {
@@ -348,13 +348,13 @@ describe('League node: ', function () {
             msg.payload.leagueDashPTShots[0].should.have.property("playerId");
             done();
           });
-          n1.receive({ payload: "2018-19", player_team: "P"});
+          n1.receive({ payload: "2018-19", player_or_team: "P"});
         });
       });
 
     it('league shooting by team', function (done) {
         var flow = [
-          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "shooting", season_type: "Regular Season", per_mode: "PerGame",  season: "2018-19",  player_team: "T"},
+          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "shooting", season_type: "Regular Season", per_mode: "PerGame",  season: "2018-19",  player_or_team: "T"},
           { id: "n2", type: "helper" }
         ];
         helper.load(nbaNode, flow, function () {
@@ -372,7 +372,7 @@ describe('League node: ', function () {
 
     it('league hustle by player', function (done) {
         var flow = [
-          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "hustle", season_type: "Regular Season", per_mode: "PerGame",  season: "2018-19",  player_team: "P"},
+          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "hustle", season_type: "Regular Season", per_mode: "PerGame",  season: "2018-19",  player_or_team: "P"},
           { id: "n2", type: "helper" }
         ];
         helper.load(nbaNode, flow, function () {
@@ -393,7 +393,7 @@ describe('League node: ', function () {
 
     it('league hustle by team', function (done) {
       var flow = [
-        { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "hustle", season_type: "Regular Season", per_mode: "PerGame",  season: "2018-19",  player_team: "T"},
+        { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "hustle", season_type: "Regular Season", per_mode: "PerGame",  season: "2018-19",  player_or_team: "T"},
         { id: "n2", type: "helper" }
       ];
       helper.load(nbaNode, flow, function () {
@@ -414,7 +414,7 @@ describe('League node: ', function () {
 
     it('league clutch by player', function (done) {
         var flow = [
-          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "clutch", season_type: "Regular Season", per_mode: "PerGame",  season: "2018-19",  player_team: "P", ahead_behind: "Ahead or Behind", clutch_time: "Last 5 Minutes", point_diff: "5"},
+          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "clutch", season_type: "Regular Season", per_mode: "PerGame",  season: "2018-19",  player_or_team: "P", ahead_behind: "Ahead or Behind", clutch_time: "Last 5 Minutes", point_diff: "5"},
           { id: "n2", type: "helper" }
         ];
         helper.load(nbaNode, flow, function () {
@@ -432,7 +432,7 @@ describe('League node: ', function () {
 
     it('league clutch by team', function (done) {
         var flow = [
-          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "clutch", season_type: "Regular Season", per_mode: "PerGame",  season: "2018-19",  player_team: "T", ahead_behind: "Ahead or Behind", clutch_time: "Last 5 Minutes", point_diff: "5"},
+          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "clutch", season_type: "Regular Season", per_mode: "PerGame",  season: "2018-19",  player_or_team: "T", ahead_behind: "Ahead or Behind", clutch_time: "Last 5 Minutes", point_diff: "5"},
           { id: "n2", type: "helper" }
         ];
         helper.load(nbaNode, flow, function () {
@@ -450,7 +450,7 @@ describe('League node: ', function () {
 
     it('(node) ahead_behind load from msg.ahead_behind', function (done) {
         var flow = [
-          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "clutch", season_type: "Regular Season", per_mode: "PerGame",  season: "2018-19",  player_team: "P", ahead_behind: "dynamic", clutch_time: "Last 5 Minutes", point_diff: "5"},
+          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "clutch", season_type: "Regular Season", per_mode: "PerGame",  season: "2018-19",  player_or_team: "P", ahead_behind: "dynamic", clutch_time: "Last 5 Minutes", point_diff: "5"},
           { id: "n2", type: "helper" }
         ];
         helper.load(nbaNode, flow, function () {
@@ -468,7 +468,7 @@ describe('League node: ', function () {
 
       it('(node) clutch_time load from msg.clutch_time', function (done) {
         var flow = [
-          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "clutch", season_type: "Regular Season", per_mode: "PerGame",  season: "2018-19",  player_team: "P", ahead_behind: "Ahead or Behind", clutch_time: "dynamic", point_diff: "5"},
+          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "clutch", season_type: "Regular Season", per_mode: "PerGame",  season: "2018-19",  player_or_team: "P", ahead_behind: "Ahead or Behind", clutch_time: "dynamic", point_diff: "5"},
           { id: "n2", type: "helper" }
         ];
         helper.load(nbaNode, flow, function () {
@@ -486,7 +486,7 @@ describe('League node: ', function () {
 
       it('(node) point_diff mustache', function (done) {
         var flow = [
-          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "clutch", season_type: "Regular Season", per_mode: "PerGame",  season: "2018-19",  player_team: "P", ahead_behind: "Ahead or Behind", clutch_time: "Last 5 Minutes", point_diff: "{{payload}}"},
+          { id: "n1", type: "league", name: "league", wires:[["n2"]], league_type: "clutch", season_type: "Regular Season", per_mode: "PerGame",  season: "2018-19",  player_or_team: "P", ahead_behind: "Ahead or Behind", clutch_time: "Last 5 Minutes", point_diff: "{{payload}}"},
           { id: "n2", type: "helper" }
         ];
         helper.load(nbaNode, flow, function () {

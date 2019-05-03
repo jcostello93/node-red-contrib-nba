@@ -15,6 +15,7 @@ module.exports = function(RED) {
 	var teamObjFromID = nba_helper.teamObjFromID; 
 	var cleanData = nba_helper.cleanData;
 	var addMissingParamDefaultValues = nba_helper.addMissingParamDefaultValues;
+	var addGroupQuantityValues = nba_helper.addGroupQuantityValues; 
 
 	var resetNodeStatus = node_helper.resetNodeStatus; 
 	var setLoadingStatus = node_helper.setLoadingStatus; 
@@ -25,6 +26,7 @@ module.exports = function(RED) {
 
 	// Dynamically load parameters from nba-client-template in nodes
 	addMissingParamDefaultValues(); 
+	addGroupQuantityValues(); 
 	RED.httpAdmin.get("/params", function(req,res) {
 		res.json({params: NBA_CLIENT.parameters})
     });

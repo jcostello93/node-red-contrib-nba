@@ -44,7 +44,7 @@ function getTeamNodeProps() {
         "per_mode",
         "measure_type",
         "group_quantity",
-        "player_team",
+        "player_or_team",
         "team_type",
         "season",
         "season_type"
@@ -61,12 +61,10 @@ function getTeamProps(n, msg) {
     })
 
     props.team_id = parseInt(props.team_id);    
-
-    props.player_team = playerTeamHelper(props.player_team);  
-
+    props.player_or_team = playerTeamHelper(props.player_or_team); 
 
     if (props.team_type === "shooting") {
-        props.team_type = (props.player_team === "P") ? "player_shooting" : "team_shooting";
+        props.team_type = (props.player_or_team === "P") ? "player_shooting" : "team_shooting";
     }
 
     return props;

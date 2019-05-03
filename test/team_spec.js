@@ -130,7 +130,7 @@ describe('Team node: ', function () {
 
       it('team shooting by player', function (done) {
         var flow = [
-          { id: "n1", type: "team", name: "team", wires:[["n2"]], team_type: "shooting", team_id: "1610612752", season_type: "Regular Season", per_mode: "PerGame", season: "2018-19", player_team: "P"},
+          { id: "n1", type: "team", name: "team", wires:[["n2"]], team_type: "shooting", team_id: "1610612752", season_type: "Regular Season", per_mode: "PerGame", season: "2018-19", player_or_team: "P"},
           { id: "n2", type: "helper" }
         ];
         helper.load(nbaNode, flow, function () {
@@ -149,7 +149,7 @@ describe('Team node: ', function () {
 
       it('team shooting by team', function (done) {
         var flow = [
-          { id: "n1", type: "team", name: "team", wires:[["n2"]], team_type: "shooting", team_id: "1610612752", season_type: "Regular Season", per_mode: "PerGame", season: "2018-19", player_team: "T"},
+          { id: "n1", type: "team", name: "team", wires:[["n2"]], team_type: "shooting", team_id: "1610612752", season_type: "Regular Season", per_mode: "PerGame", season: "2018-19", player_or_team: "T"},
           { id: "n2", type: "helper" }
         ];
         helper.load(nbaNode, flow, function () {
@@ -166,9 +166,9 @@ describe('Team node: ', function () {
         });
       });
 
-      it('(node) player_team load from msg.player_team', function (done) {
+      it('(node) player_or_team load from msg.player_or_team', function (done) {
         var flow = [
-          { id: "n1", type: "team", name: "team", wires:[["n2"]], team_type: "shooting", team_id: "1610612752", season_type: "Regular Season", per_mode: "PerGame", season: "2018-19", player_team: "dynamic"},
+          { id: "n1", type: "team", name: "team", wires:[["n2"]], team_type: "shooting", team_id: "1610612752", season_type: "Regular Season", per_mode: "PerGame", season: "2018-19", player_or_team: "dynamic"},
           { id: "n2", type: "helper" }
         ];
         helper.load(nbaNode, flow, function () {
@@ -181,7 +181,7 @@ describe('Team node: ', function () {
             msg.payload.leagueDashPTShots[0].should.have.property("fgm");
             done();
           });
-          n1.receive({ payload: "", player_team: "T"});
+          n1.receive({ payload: "", player_or_team: "T"});
         });
       });
       

@@ -236,6 +236,10 @@
             return text.replace(/(?:^|\.?)([A-Z])/g, function (x,y){return "_" + y.toLowerCase()}).replace(/^_/, "");
         }
 
+        function camelToSpaced(text) {
+            return text.replace(/(?:^|\.?)([A-Z])/g, function (x,y){return " " + y}).replace(/^_/, "");
+        }
+
         function addDynamicLoadOption(select, prop) {
             var prop_snake = camelToSnake(prop);
             var option = document.createElement("option");
@@ -244,8 +248,9 @@
             select.add(option);
         }
         
-        function addOptions(data, select, prop) {
+        function addOptions(data, prop) {
             var prop_snake = camelToSnake(prop);
+            var select = document.getElementById("node-input-" + prop_snake); 
             var select_val = this[prop_snake];
             var param = data.params.find(param => param.name === prop); 
             param.values.forEach((param) => {
@@ -257,12 +262,45 @@
             setDefaultOption(param.default, select, select_val, prop_snake);  
         }
 
+        function addDiv(id) {
+            var outer_div = document.getElementById("outer-div");
+            
+            var div = document.createElement("div");
+            div.className = "form-row";
+            div.id = "node-action-" + camelToSnake(id); 
 
+            var label = document.createElement("label"); 
+            label.htmlFor = "node-input-" + camelToSnake(id);   
+            label.style.marginRight = "3px";           
+           
+            var i = document.createElement("i");
+            i.className = "fa fa-wrench";
+
+            label.appendChild(i); 
+            label.appendChild(document.createTextNode(" " + camelToSpaced(id)));
+
+            var select = document.createElement("select");
+            select.type = "text"; 
+            select.id = "node-input-" + camelToSnake(id); 
+            select.style.display = "inline-block"; 
+            select.style.width = "250px";
+            select.style.verticalAlign = "top"; 
+
+            div.appendChild(label); 
+            div.appendChild(select); 
+            outer_div.appendChild(div); 
+        }
 
         $.get("params", function(data, status){
-            addOptions(data, document.getElementById("node-input-season"), "Season");
-            addOptions(data, document.getElementById("node-input-measure_type"), "MeasureType")
-            addOptions(data, document.getElementById("node-input-season_type"), "SeasonType")
+            var dynamic_fields = ["Season", "MeasureType", "SeasonType"];
+
+            dynamic_fields.forEach((field) => {   
+                addDiv(field);               
+                addOptions(data, field);
+            })
+            
+            hideExtraActions()
+            showActions()
         });
         
 
@@ -289,8 +327,6 @@
             showActions()
         });
 
-        hideExtraActions()
-        showActions()
     }
 
     RED.nodes.registerType('player',{
@@ -317,35 +353,25 @@
 </script>
 
 <script type="text/x-red" data-template-name="player">
-    <div class="form-row">
-        <label for="node-input-name"><i class="icon-tag"></i> name</label>
-        <input type="text" id="node-input-name" placeholder="name">
-    </div>
-    <div class="form-row" id="node-action-player_type"> 
-        <label for="node-input-player_type"><i class="fa fa-wrench"></i> get</label>
-        <select type="text" id="node-input-player_type" style="display: inline-block; width: 250px; vertical-align: top;">
-            <option value="profile" outputs="1">profile</option>
-            <option value="stats" outputs="1">career stats</option>
-            <option value="shot chart" outputs="1">shot chart</option>
-            <option value="shot dashboard" outputs="1">shot dashboard</option>
-            <option value="splits" outputs="1">splits</option>
-        </select>
-    </div>
-    <div class="form-row" id="node-action-season_type"> 
-        <label for="node-input-season_type"><i class="fa fa-wrench"></i> season type</label>
-        <select type="text" id="node-input-season_type" style="display: inline-block; width: 250px; vertical-align: top;"></select>
-    </div>
-    <div class="form-row" id="node-action-measure_type"> 
-        <label for="node-input-measure_type"><i class="fa fa-wrench"></i> measure type</label>
-        <select type="text" id="node-input-measure_type" style="display: inline-block; width: 250px; vertical-align: top;"></select>
-    </div>    
-    <div class="form-row" id="node-action-season">
-        <label for="node-input-season"><i class="icon-tag"></i> season</label>
-        <select type="text" id="node-input-season"  style="display: inline-block; width 250px; vertical-align: top;"></select>
-    </div>
-    <div class="form-row" id="node-action-player_id">
-        <label for="node-input-player_id"><i class="icon-tag"></i> player_id</label>
-        <input type="text" id="node-input-player_id" placeholder="player_id">
+    <div id="outer-div">
+        <div class="form-row">
+            <label for="node-input-name"><i class="icon-tag"></i> name</label>
+            <input type="text" id="node-input-name" placeholder="name">
+        </div>
+        <div class="form-row" id="node-action-player_type"> 
+            <label for="node-input-player_type"><i class="fa fa-wrench"></i> get</label>
+            <select type="text" id="node-input-player_type" style="display: inline-block; width: 250px; vertical-align: top;">
+                <option value="profile" outputs="1">profile</option>
+                <option value="stats" outputs="1">career stats</option>
+                <option value="shot chart" outputs="1">shot chart</option>
+                <option value="shot dashboard" outputs="1">shot dashboard</option>
+                <option value="splits" outputs="1">splits</option>
+            </select>
+        </div>
+        <div class="form-row" id="node-action-player_id">
+            <label for="node-input-player_id"><i class="icon-tag"></i> player_id</label>
+            <input type="text" id="node-input-player_id" placeholder="player_id">
+        </div>
     </div>
 </script>
 
@@ -442,6 +468,10 @@
             return text.replace(/(?:^|\.?)([A-Z])/g, function (x,y){return "_" + y.toLowerCase()}).replace(/^_/, "");
         }
 
+        function camelToSpaced(text) {
+            return text.replace(/(?:^|\.?)([A-Z])/g, function (x,y){return " " + y}).replace(/^_/, "");
+        }
+
         function addDynamicLoadOption(select, prop) {
             var prop_snake = camelToSnake(prop);
             var option = document.createElement("option");
@@ -450,8 +480,9 @@
             select.add(option);
         }
         
-        function addOptions(data, select, prop) {
+        function addOptions(data, prop) {
             var prop_snake = camelToSnake(prop);
+            var select = document.getElementById("node-input-" + prop_snake); 
             var select_val = this[prop_snake];
             var param = data.params.find(param => param.name === prop); 
             param.values.forEach((param) => {
@@ -463,13 +494,45 @@
             setDefaultOption(param.default, select, select_val, prop_snake);              
         }
 
+        function addDiv(id) {
+            var outer_div = document.getElementById("outer-div");
+            
+            var div = document.createElement("div");
+            div.className = "form-row";
+            div.id = "node-action-" + camelToSnake(id); 
 
+            var label = document.createElement("label"); 
+            label.htmlFor = "node-input-" + camelToSnake(id);   
+            label.style.marginRight = "3px";           
+           
+            var i = document.createElement("i");
+            i.className = "fa fa-wrench";
+
+            label.appendChild(i); 
+            label.appendChild(document.createTextNode(" " + camelToSpaced(id)));
+
+            var select = document.createElement("select");
+            select.type = "text"; 
+            select.id = "node-input-" + camelToSnake(id); 
+            select.style.display = "inline-block"; 
+            select.style.width = "250px";
+            select.style.verticalAlign = "top"; 
+
+            div.appendChild(label); 
+            div.appendChild(select); 
+            outer_div.appendChild(div); 
+        }
 
         $.get("params", function(data, status){
-            addOptions(data, document.getElementById("node-input-season"), "Season");
-            addOptions(data, document.getElementById("node-input-measure_type"), "MeasureType");
-            addOptions(data, document.getElementById("node-input-season_type"), "SeasonType");
-            addOptions(data, document.getElementById("node-input-per_mode"), "PerMode");
+            var dynamic_fields = ["Season", "MeasureType", "SeasonType", "PerMode", "PlayerOrTeam", "GroupQuantity"];
+
+            dynamic_fields.forEach((field) => {   
+                addDiv(field);               
+                addOptions(data, field);
+            })
+            
+            hideExtraActions()
+            showActions()
         });
 
         function hideExtraActions(){
@@ -478,7 +541,7 @@
             $("#node-action-measure_type").hide();
             $("#node-action-per_mode").hide();
             $("#node-action-group_quantity").hide();
-            $("#node-action-player_team").hide();
+            $("#node-action-player_or_team").hide();
         }
 
         function showActions(){
@@ -498,7 +561,7 @@
                 $("#node-action-measure_type").show();
                 $("#node-action-group_quantity").show();
             } else if (team_type === "shooting") {
-                $("#node-action-player_team").show();
+                $("#node-action-player_or_team").show();
                 $("#node-action-season").show();
                 $("#node-action-season_type").show();
                 $("#node-action-per_mode").show();
@@ -523,8 +586,6 @@
             showActions()
         });
 
-        hideExtraActions()
-        showActions()
     }
 
     RED.nodes.registerType('team',{
@@ -538,8 +599,8 @@
             season_type: {value: ""},
             measure_type: {value: ""},
             per_mode: {value: ""},
-            group_quantity: {value: "5"},
-            player_team: {value: "P"}
+            group_quantity: {value: ""},
+            player_or_team: {value: ""}
         },
         icon: "nba_icon.png",
         inputs:1,
@@ -554,63 +615,31 @@
 </script>
 
 <script type="text/x-red" data-template-name="team">
-    <div class="form-row">
-        <label for="node-input-name"><i class="icon-tag"></i> name</label>
-        <input type="text" id="node-input-name" placeholder="name">
-    </div>
-    <div class="form-row" id="node-action-team_type"> 
-        <label for="node-input-team_type"><i class="fa fa-wrench"></i> get</label>
-        <select type="text" id="node-input-team_type" style="display: inline-block; width: 250px; vertical-align: top;">
-            <option value="profile" outputs="1">profile</option>
-            <option value="roster" outputs="1">roster</option>
-            <option value="schedule" outputs="1">schedule</option>
-            <option value="stats" outputs="1">stats</option>
-            <option value="leaders" outputs="1">leaders</option>
-            <option value="shooting" outputs="1">shooting</option>
-            <option value="splits" outputs="1">splits</option>            
-            <option value="lineups" outputs="1">lineups</option>
-            <option value="on/off details" outputs="1">on/off details</option>
-            <option value="shot chart" outputs="1">shot chart</option>
-        </select>
-    </div>
-    <div class="form-row" id="node-action-season_type"> 
-        <label for="node-input-season_type"><i class="fa fa-wrench"></i> season type</label>
-        <select type="text" id="node-input-season_type" style="display: inline-block; width: 250px; vertical-align: top;"></select>
-    </div>
-    <div class="form-row" id="node-action-season">
-        <label for="node-input-season"><i class="icon-tag"></i> season</label>
-        <select type="text" id="node-input-season" style="display: inline-block; width: 250px; vertical-align: top;"></select>
-    </div>
-    <div class="form-row" id="node-action-measure_type"> 
-        <label for="node-input-measure_type"><i class="fa fa-wrench"></i> measure type</label>
-        <select type="text" id="node-input-measure_type" style="display: inline-block; width: 250px; vertical-align: top;"></select>
-    </div>
-    <div class="form-row" id="node-action-player_team"> 
-        <label for="node-input-player_team"><i class="fa fa-wrench"></i> player or team</label>
-        <select type="text" id="node-input-player_team" style="display: inline-block; width: 250px; vertical-align: top;">
-            <option value="P" outputs="1">Player</option>
-            <option value="T" outputs="1">Team</option>
-            <option value="dynamic" outputs="1">load from msg.player_team</option>
-        </select>
-    </div>
-    <div class="form-row" id="node-action-per_mode"> 
-        <label for="node-input-per_mode"><i class="fa fa-wrench"></i> per mode</label>
-        <select type="text" id="node-input-per_mode" style="display: inline-block; width: 250px; vertical-align: top;"></select>
-    </div>
-    <div class="form-row" id="node-action-group_quantity"> 
-        <label for="node-input-group_quantity"><i class="fa fa-wrench"></i> group quantity</label>
-        <select type="text" id="node-input-group_quantity" style="display: inline-block; width: 250px; vertical-align: top;">
-            <option value="2" outputs="1">2</option>
-            <option value="3" outputs="1">3</option>
-            <option value="4" outputs="1">4</option>
-            <option value="5" outputs="1">5</option>
-            <option value="dynamic" outputs="1">load from msg.group_quantity</option>
-        </select>
-    </div>
-    <div class="form-row" id="node-action-team_id">
-        <label for="node-input-team_id"><i class="icon-tag"></i> team_id</label>
-        <input type="text" id="node-input-team_id" placeholder="team_id">
-    </div>      
+    <div id="outer-div">
+        <div class="form-row">
+            <label for="node-input-name"><i class="icon-tag"></i> name</label>
+            <input type="text" id="node-input-name" placeholder="name">
+        </div>
+        <div class="form-row" id="node-action-team_type"> 
+            <label for="node-input-team_type"><i class="fa fa-wrench"></i> get</label>
+            <select type="text" id="node-input-team_type" style="display: inline-block; width: 250px; vertical-align: top;">
+                <option value="profile" outputs="1">profile</option>
+                <option value="roster" outputs="1">roster</option>
+                <option value="schedule" outputs="1">schedule</option>
+                <option value="stats" outputs="1">stats</option>
+                <option value="leaders" outputs="1">leaders</option>
+                <option value="shooting" outputs="1">shooting</option>
+                <option value="splits" outputs="1">splits</option>            
+                <option value="lineups" outputs="1">lineups</option>
+                <option value="on/off details" outputs="1">on/off details</option>
+                <option value="shot chart" outputs="1">shot chart</option>
+            </select>
+        </div>
+        <div class="form-row" id="node-action-team_id">
+            <label for="node-input-team_id"><i class="icon-tag"></i> team_id</label>
+            <input type="text" id="node-input-team_id" placeholder="team_id">
+        </div>  
+    </div> 
 </script>
 
 <script type="text/x-red" data-help-name="team">
@@ -684,12 +713,7 @@
         setDefaultOption = setDefaultOption.bind(node);        
 
         function addOption(param, select) {
-            var option = document.createElement("option");
-            // if (param === "" || param === " ") {
-            //     return; 
-            // }
-
-            
+            var option = document.createElement("option");        
             option.text = param;
             option.value = param;
             select.add(option);
@@ -718,6 +742,10 @@
             return text.replace(/(?:^|\.?)([A-Z])/g, function (x,y){return "_" + y.toLowerCase()}).replace(/^_/, "");
         }
 
+        function camelToSpaced(text) {
+            return text.replace(/(?:^|\.?)([A-Z])/g, function (x,y){return " " + y}).replace(/^_/, "");
+        }
+
         function addDynamicLoadOption(select, prop) {
             var prop_snake = camelToSnake(prop);
             var option = document.createElement("option");
@@ -726,8 +754,9 @@
             select.add(option);
         }
         
-        function addOptions(data, select, prop) {
+        function addOptions(data, prop) {
             var prop_snake = camelToSnake(prop);
+            var select = document.getElementById("node-input-" + prop_snake); 
             var select_val = this[prop_snake];
             var param = data.params.find(param => param.name === prop); 
             param.values.forEach((param) => {
@@ -736,26 +765,50 @@
 
             addDefaultOption(param.default, select); 
             addDynamicLoadOption(select, prop);
-            setDefaultOption(param.default, select, select_val, prop_snake);      
+            setDefaultOption(param.default, select, select_val, prop_snake);  
         }
 
+        function addDiv(id) {
+            var outer_div = document.getElementById("outer-div");
+            
+            var div = document.createElement("div");
+            div.className = "form-row";
+            div.id = "node-action-" + camelToSnake(id); 
 
+            var label = document.createElement("label"); 
+            label.htmlFor = "node-input-" + camelToSnake(id);   
+            label.style.marginRight = "3px";           
+           
+            var i = document.createElement("i");
+            i.className = "fa fa-wrench";
+
+            label.appendChild(i); 
+            label.appendChild(document.createTextNode(" " + camelToSpaced(id)));
+
+            var select = document.createElement("select");
+            select.type = "text"; 
+            select.id = "node-input-" + camelToSnake(id); 
+            select.style.display = "inline-block"; 
+            select.style.width = "250px";
+            select.style.verticalAlign = "top"; 
+
+            div.appendChild(label); 
+            div.appendChild(select); 
+            outer_div.appendChild(div); 
+        }
 
         $.get("params", function(data, status){
-            addOptions(data, document.getElementById("node-input-season"), "Season");
-            addOptions(data, document.getElementById("node-input-measure_type"), "MeasureType");
-            addOptions(data, document.getElementById("node-input-season_type"), "SeasonType");
-            addOptions(data, document.getElementById("node-input-per_mode"), "PerMode");
-            addOptions(data, document.getElementById("node-input-sorter"), "Sorter");
-            addOptions(data, document.getElementById("node-input-stat_category"), "StatCategory");
-            addOptions(data, document.getElementById("node-input-pt_measure_type"), "PtMeasureType");
-            addOptions(data, document.getElementById("node-input-ahead_behind"), "AheadBehind");
-            addOptions(data, document.getElementById("node-input-clutch_time"), "ClutchTime");
-            addOptions(data, document.getElementById("node-input-close_def_dist_range"), "CloseDefDistRange")
-            addOptions(data, document.getElementById("node-input-dribble_range"), "DribbleRange")
-            addOptions(data, document.getElementById("node-input-touch_time_range"), "TouchTimeRange")
-            addOptions(data, document.getElementById("node-input-shot_clock_range"), "ShotClockRange")
-            addOptions(data, document.getElementById("node-input-general_range"), "GeneralRange")
+            var dynamic_fields = ["Season", "MeasureType", "SeasonType", "PerMode", "PlayerOrTeam", "Sorter", "StatCategory",
+                                "PtMeasureType", "AheadBehind", "ClutchTime", "CloseDefDistRange", "GroupQuantity",
+                                "DribbleRange", "TouchTimeRange", "ShotClockRange", "GeneralRange"];
+
+            dynamic_fields.forEach((field) => {   
+                addDiv(field);               
+                addOptions(data, field);
+            })
+            
+            hideExtraActions()
+            showActions()
         });
 
         function hideExtraActions(){
@@ -765,7 +818,7 @@
             $("#node-action-game_date").hide();
             $("#node-action-stat_category").hide();
             $("#node-action-sorter").hide();
-            $("#node-action-player_team").hide();
+            $("#node-action-player_or_team").hide();
             $("#node-action-measure_type").hide();
             $("#node-action-pt_measure_type").hide();
             $("#node-action-ahead_behind").hide();
@@ -778,8 +831,7 @@
             $("#node-action-shot_clock_range").hide();
             $("#node-action-general_range").hide();
         }
-        
-
+    
         function showActions(){
             var league_type = $("#node-input-league_type option:selected").val();
             if (league_type === "leaders") {
@@ -796,26 +848,26 @@
                 $("#node-action-season").show();
                 $("#node-action-season_type").show();
                 $("#node-action-sorter").show();
-                $("#node-action-player_team").show();
+                $("#node-action-player_or_team").show();
             } else if (league_type === "shooting") {
                 $("#node-action-close_def_dist_range").show();
                 $("#node-action-dribble_range").show();
                 $("#node-action-touch_time_range").show();
                 $("#node-action-shot_clock_range").show();
                 $("#node-action-general_range").show();
-                $("#node-action-player_team").show();
+                $("#node-action-player_or_team").show();
                 $("#node-action-season").show();
                 $("#node-action-season_type").show();
                 $("#node-action-per_mode").show();
 
             } else if (league_type === "hustle") {
-                $("#node-action-player_team").show();
+                $("#node-action-player_or_team").show();
                 $("#node-action-season").show();
                 $("#node-action-season_type").show();
                 $("#node-action-per_mode").show();
 
             } else if (league_type === "clutch") {
-                $("#node-action-player_team").show();
+                $("#node-action-player_or_team").show();
                 $("#node-action-season").show();
                 $("#node-action-season_type").show();
                 $("#node-action-per_mode").show();
@@ -832,7 +884,7 @@
                 $("#node-action-season").show();
                 $("#node-action-season_type").show();
                 $("#node-action-per_mode").show();
-                $("#node-action-player_team").show();
+                $("#node-action-player_or_team").show();
                 $("#node-action-pt_measure_type").show();
             } else if (league_type === "schedule") {
                 $("#node-action-season").show();
@@ -862,7 +914,7 @@
             per_mode: {value: ""},
             stat_category: {value: ""},
             sorter: {value: ""},
-            player_team: {value: "P"},
+            player_or_team: {value: ""},
             measure_type: {value: ""},
             ahead_behind: {value: ""},
             point_diff: {value: ""},
@@ -888,107 +940,35 @@
 </script>
 
 <script type="text/x-red" data-template-name="league">
-    <div class="form-row">
-        <label for="node-input-name"><i class="icon-tag"></i> name</label>
-        <input type="text" id="node-input-name" placeholder="name">
-    </div>
-    <div class="form-row" id="node-action-league_type"> 
-        <label for="node-input-league_type"><i class="fa fa-wrench"></i> get</label>
-        <select type="text" id="node-input-league_type" style="display: inline-block; width: 250px; vertical-align: top;">
-            <option value="scoreboard" outputs="1">scoreboard</option>
-            <option value="leaders" outputs="1">leaders</option>
-            <option value="standings" outputs="1">standings</option>
-            <option value="game log" outputs="1">game log</option>
-            <option value="player tracking" outputs="1">player tracking</option>
-            <option value="shooting" outputs="1">shooting</option>
-            <option value="hustle" outputs="1">hustle</option>
-            <option value="clutch" outputs="1">clutch</option>
-            <option value="lineups" outputs="1">lineups</option>
-            <option value="schedule" outputs="1">schedule</option>
-            <option value="playoffs bracket" outputs="1">playoffs bracket</option>
-        </select>
-    </div>
-    <div class="form-row" id="node-action-season_type"> 
-        <label for="node-input-season_type"><i class="fa fa-wrench"></i> season type</label>
-        <select type="text" id="node-input-season_type" style="display: inline-block; width: 250px; vertical-align: top;"></select>
-    </div>
-    <div class="form-row" id="node-action-season">
-        <label for="node-input-season"><i class="icon-tag"></i> season</label>
-        <select type="text" id="node-input-season" style="display: inline-block; width: 250px; vertical-align: top;"></select>
-    </div>
-    <div class="form-row" id="node-action-player_team"> 
-        <label for="node-input-player_team"><i class="fa fa-wrench"></i> player or team</label>
-        <select type="text" id="node-input-player_team" style="display: inline-block; width: 250px; vertical-align: top;">
-            <option value="P" outputs="1">Player</option>
-            <option value="T" outputs="1">Team</option>
-            <option value="dynamic" outputs="1">load from msg.player_team</option>
-        </select>
-    </div>    
-    <div class="form-row" id="node-action-per_mode"> 
-        <label for="node-input-per_mode"><i class="fa fa-wrench"></i> per mode</label>
-        <select type="text" id="node-input-per_mode" style="display: inline-block; width: 250px; vertical-align: top;"></select>
-    </div>
-    <div class="form-row" id="node-action-measure_type"> 
-        <label for="node-input-measure_type"><i class="fa fa-wrench"></i> measure type</label>
-        <select type="text" id="node-input-measure_type" style="display: inline-block; width: 250px; vertical-align: top;"></select>
-    </div>
-    <div class="form-row" id="node-action-pt_measure_type"> 
-        <label for="node-input-pt_measure_type"><i class="fa fa-wrench"></i> pt measure type</label>
-        <select type="text" id="node-input-pt_measure_type" style="display: inline-block; width: 250px; vertical-align: top;"></select>
-    </div>
-    <div class="form-row" id="node-action-close_def_dist_range"> 
-        <label for="node-input-close_def_dist_range"><i class="fa fa-wrench"></i> closest defender</label>
-        <select type="text" id="node-input-close_def_dist_range" style="display: inline-block; width: 250px; vertical-align: top;"></select>
-    </div>
-    <div class="form-row" id="node-action-dribble_range"> 
-        <label for="node-input-dribble_range"><i class="fa fa-wrench"></i> dribbles</label>
-        <select type="text" id="node-input-dribble_range" style="display: inline-block; width: 250px; vertical-align: top;"></select>
-    </div> 
-    <div class="form-row" id="node-action-touch_time_range"> 
-        <label for="node-input-touch_time_range"><i class="fa fa-wrench"></i> touch time</label>
-        <select type="text" id="node-input-touch_time_range" style="display: inline-block; width: 250px; vertical-align: top;"></select>
-    </div> 
-    <div class="form-row" id="node-action-shot_clock_range"> 
-        <label for="node-input-shot_clock_range"><i class="fa fa-wrench"></i> shot clock</label>
-        <select type="text" id="node-input-shot_clock_range" style="display: inline-block; width: 250px; vertical-align: top;"></select>
-    </div> 
-    <div class="form-row" id="node-action-general_range"> 
-        <label for="node-input-general_range"><i class="fa fa-wrench"></i> general range</label>
-        <select type="text" id="node-input-general_range" style="display: inline-block; width: 250px; vertical-align: top;"></select>
-    </div>  
-    <div class="form-row" id="node-action-ahead_behind"> 
-        <label for="node-input-ahead_behind"><i class="fa fa-wrench"></i> ahead or behind</label>
-        <select type="text" id="node-input-ahead_behind" style="display: inline-block; width: 250px; vertical-align: top;"></select>
-    </div>
-    <div class="form-row" id="node-action-stat_category"> 
-        <label for="node-input-stat_category"><i class="fa fa-wrench"></i> stat category</label>
-        <select type="text" id="node-input-stat_category" style="display: inline-block; width: 250px; vertical-align: top;"></select>
-    </div>
-    <div class="form-row" id="node-action-sorter"> 
-        <label for="node-input-sorter"><i class="fa fa-wrench"></i> sorter</label>
-        <select type="text" id="node-input-sorter" style="display: inline-block; width: 250px; vertical-align: top;"></select>
-    </div>
-    <div class="form-row" id="node-action-clutch_time"> 
-        <label for="node-input-clutch_time"><i class="fa fa-wrench"></i> clutch time</label>
-        <select type="text" id="node-input-clutch_time" style="display: inline-block; width: 250px; vertical-align: top;"></select>
-    </div>
-    <div class="form-row" id="node-action-group_quantity"> 
-        <label for="node-input-group_quantity"><i class="fa fa-wrench"></i> group quantity</label>
-        <select type="text" id="node-input-group_quantity" style="display: inline-block; width: 250px; vertical-align: top;">
-            <option value="2" outputs="1">2</option>
-            <option value="3" outputs="1">3</option>
-            <option value="4" outputs="1">4</option>
-            <option value="5" outputs="1">5</option>
-            <option value="dynamic" outputs="1">load from msg.group_quantity</option>
-        </select>
-    </div>    
-    <div class="form-row" id="node-action-point_diff">
-        <label for="node-input-point_diff"><i class="icon-tag"></i> point diff</label>
-        <input type="text" id="node-input-point_diff" placeholder="5">
-    </div>
-    <div class="form-row" id="node-action-game_date">
-        <label for="node-input-game_date"><i class="icon-tag"></i> game date</label>
-        <input type="text" id="node-input-game_date" placeholder="YYYY-MM-DD">
+    <div id="outer-div">
+        <div class="form-row">
+            <label for="node-input-name"><i class="icon-tag"></i> name</label>
+            <input type="text" id="node-input-name" placeholder="name">
+        </div>
+        <div class="form-row" id="node-action-league_type"> 
+            <label for="node-input-league_type"><i class="fa fa-wrench"></i> get</label>
+            <select type="text" id="node-input-league_type" style="display: inline-block; width: 250px; vertical-align: top;">
+                <option value="scoreboard" outputs="1">scoreboard</option>
+                <option value="leaders" outputs="1">leaders</option>
+                <option value="standings" outputs="1">standings</option>
+                <option value="game log" outputs="1">game log</option>
+                <option value="player tracking" outputs="1">player tracking</option>
+                <option value="shooting" outputs="1">shooting</option>
+                <option value="hustle" outputs="1">hustle</option>
+                <option value="clutch" outputs="1">clutch</option>
+                <option value="lineups" outputs="1">lineups</option>
+                <option value="schedule" outputs="1">schedule</option>
+                <option value="playoffs bracket" outputs="1">playoffs bracket</option>
+            </select>
+        </div>
+        <div class="form-row" id="node-action-point_diff">
+            <label for="node-input-point_diff"><i class="icon-tag"></i> point diff</label>
+            <input type="text" id="node-input-point_diff" placeholder="5">
+        </div>
+        <div class="form-row" id="node-action-game_date">
+            <label for="node-input-game_date"><i class="icon-tag"></i> game date</label>
+            <input type="text" id="node-input-game_date" placeholder="YYYY-MM-DD">
+        </div>
     </div>
 </script>
 
@@ -1099,6 +1079,10 @@
             return text.replace(/(?:^|\.?)([A-Z])/g, function (x,y){return "_" + y.toLowerCase()}).replace(/^_/, "");
         }
 
+        function camelToSpaced(text) {
+            return text.replace(/(?:^|\.?)([A-Z])/g, function (x,y){return " " + y}).replace(/^_/, "");
+        }
+
         function addDynamicLoadOption(select, prop) {
             var prop_snake = camelToSnake(prop);
             var option = document.createElement("option");
@@ -1107,8 +1091,9 @@
             select.add(option);
         }
         
-        function addOptions(data, select, prop) {
+        function addOptions(data, prop) {
             var prop_snake = camelToSnake(prop);
+            var select = document.getElementById("node-input-" + prop_snake); 
             var select_val = this[prop_snake];
             var param = data.params.find(param => param.name === prop); 
             param.values.forEach((param) => {
@@ -1117,11 +1102,48 @@
 
             addDefaultOption(param.default, select); 
             addDynamicLoadOption(select, prop);
-            setDefaultOption(param.default, select, select_val, prop_snake);  
+            setDefaultOption(param.default, select, select_val, prop_snake);              
+        }
+
+        function addDiv(id) {
+            var outer_div = document.getElementById("outer-div");
+            
+            var div = document.createElement("div");
+            div.className = "form-row";
+            div.id = "node-action-" + camelToSnake(id); 
+
+            var label = document.createElement("label"); 
+            label.htmlFor = "node-input-" + camelToSnake(id);   
+            label.style.marginRight = "3px";           
+           
+            var i = document.createElement("i");
+            i.className = "fa fa-wrench";
+
+            label.appendChild(i); 
+            label.appendChild(document.createTextNode(" " + camelToSpaced(id)));
+
+            var select = document.createElement("select");
+            select.type = "text"; 
+            select.id = "node-input-" + camelToSnake(id); 
+            select.style.display = "inline-block"; 
+            select.style.width = "250px";
+            select.style.verticalAlign = "top"; 
+
+            div.appendChild(label); 
+            div.appendChild(select); 
+            outer_div.appendChild(div); 
         }
 
         $.get("params", function(data, status){
-            addOptions(data, document.getElementById("node-input-period"), "Period");
+            var dynamic_fields = ["Period"];
+
+            dynamic_fields.forEach((field) => {   
+                addDiv(field);               
+                addOptions(data, field);
+            })
+            
+            hideExtraActions()
+            showActions()
         });
 
         $("#node-input-game_type").change(function() {
@@ -1193,41 +1215,38 @@
 </script>
 
 <script type="text/x-red" data-template-name="game">
-    <div class="form-row">
-        <label for="node-input-name"><i class="icon-tag"></i> name</label>
-        <input type="text" id="node-input-name" placeholder="name">
-    </div>
-    <div class="form-row" id="node-action-game_type"> 
-        <label for="node-input-game_type"><i class="fa fa-wrench"></i> type</label>
-        <select type="text" id="node-input-game_type" style="display: inline-block; width: 250px; vertical-align: top;">
-            <option value="box score" outputs="1">box score</option>
-            <option value="play-by-play" outputs="1">play-by-play</option>
-            <option value="shot chart" outputs="1">shot chart</option>
-            <option value="preview article" outputs="1">preview article</option>
-            <option value="recap article" outputs="1">recap article</option>
-            <option value="lead tracker" outputs="1">lead tracker</option>
-        </select>
-    </div>
-    <div class="form-row" id="node-action-live"> 
-        <label for="node-input-live"><i class="fa fa-wrench"></i> live</label>
-        <select type="text" id="node-input-live" style="display: inline-block; width: 250px; vertical-align: top;">
-            <option value="true" outputs="1">True</option>
-            <option value="false" outputs="1">False</option>
-            <option value="dynamic" outputs="1">load from msg.live</option>
-        </select>
-    </div>
-    <div class="form-row" id="node-action-game_id">
-        <label for="node-input-game_id"><i class="icon-tag"></i> game_id</label>
-        <input type="text" id="node-input-game_id" placeholder="game_id">
-    </div>
-    <div class="form-row" id="node-action-game_date">
-        <label for="node-input-game_date"><i class="icon-tag"></i> game date</label>
-        <input type="text" id="node-input-game_date" placeholder="YYYY-MM-DD">
-    </div>
-    <div class="form-row" id="node-action-period"> 
-        <label for="node-input-period"><i class="fa fa-wrench"></i> period</label>
-        <select type="text" id="node-input-period" style="display: inline-block; width: 250px; vertical-align: top;">
-        </select>
+    <div id="outer-div">
+        <div class="form-row">
+            <label for="node-input-name"><i class="icon-tag"></i> name</label>
+            <input type="text" id="node-input-name" placeholder="name">
+        </div>
+        <div class="form-row" id="node-action-game_type"> 
+            <label for="node-input-game_type"><i class="fa fa-wrench"></i> type</label>
+            <select type="text" id="node-input-game_type" style="display: inline-block; width: 250px; vertical-align: top;">
+                <option value="box score" outputs="1">box score</option>
+                <option value="play-by-play" outputs="1">play-by-play</option>
+                <option value="shot chart" outputs="1">shot chart</option>
+                <option value="preview article" outputs="1">preview article</option>
+                <option value="recap article" outputs="1">recap article</option>
+                <option value="lead tracker" outputs="1">lead tracker</option>
+            </select>
+        </div>
+        <div class="form-row" id="node-action-live"> 
+            <label for="node-input-live"><i class="fa fa-wrench"></i> live</label>
+            <select type="text" id="node-input-live" style="display: inline-block; width: 250px; vertical-align: top;">
+                <option value="true" outputs="1">True</option>
+                <option value="false" outputs="1">False</option>
+                <option value="dynamic" outputs="1">load from msg.live</option>
+            </select>
+        </div>
+        <div class="form-row" id="node-action-game_id">
+            <label for="node-input-game_id"><i class="icon-tag"></i> game_id</label>
+            <input type="text" id="node-input-game_id" placeholder="game_id">
+        </div>
+        <div class="form-row" id="node-action-game_date">
+            <label for="node-input-game_date"><i class="icon-tag"></i> game date</label>
+            <input type="text" id="node-input-game_date" placeholder="YYYY-MM-DD">
+        </div>
     </div>
 </script>
 
