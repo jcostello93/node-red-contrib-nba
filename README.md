@@ -23,15 +23,19 @@ This project uses the [nba npm module](https://www.npmjs.com/package/nba) to cal
 
 # Nodes 
 
-There are a total of 5 nba nodes: 
+There are a total of 5 nba nodes. Two of the nodes require no ID:
 
 **database:** get player and team ids.
+
+**league:** get leaguewide data.
+
+<br>
+
+The other three require an ID:
 
 **player:** get data in relation to a given player. 
 
 **team:** get data in relation to a given team.
-
-**league:** get leaguewide data.
 
 **game:** get data in relation to a given game.
 
@@ -67,10 +71,13 @@ This node requires a team id. It will return the following information in relati
 
 * the team's profile
 * the team's roster
+* the team's schedule
 * the team's season stats
+* the team's leaders
 * the team's shooting stats
 * the team's season splits 
 * the team's lineups 
+* the team's on/off details
 * the team's shot chart 
 
 ## League
@@ -86,6 +93,8 @@ This node does not require an id, as it provides data for the entire league. It 
 * hustle stats grouped by player or team
 * clutch stats grouped by player or team
 * lineups 
+* schedule
+* playoffs bracket
 
 ## Game
 
@@ -94,8 +103,11 @@ This node requires a game id. It will return the following information in relati
 * the game's box score
 * the game's play-by-play
 * the game's shot chart
+* the game's preview article
+* the game's recap article
+* the game's lead tracker
 
-The get a game id, use the league node to get a scoreboard for a given game day. The game id will be located in <code> msg.payload.gameHeader[i].gameId</code>.
+The get a game id, use the league node to get a scoreboard for a given game day. The game id will be located in <code> msg.payload.sports_content.games.game[i].id</code>.
 
 
 # Using the nodes 
@@ -133,7 +145,7 @@ A simple example is using the database node to get a team by name and then sendi
 
 Use the database node to get player and team id's. 
 
-Use the league node to get a scoreboard for a given game day. The game id will be located in <code>msg.payload.gameHeader[i].gameId</code>.
+Use the league node to get a scoreboard for a given game day. The game id will be located in <code>msg.payload.sports_content.games.game[i].id</code>.
 
 ## The cleanedData field
 
@@ -141,10 +153,11 @@ Some responses from the NBA Stats API return result sets that map <code>headers<
 
 In this case, the node-red-contrib-nba module adds a cleanedData field that combines these arrays into an array of objects that might be easier to work with. 
 
-    Ex result set: obj.headers = [PTS, MIN]
-                   obj.rowSet = [[25, 37], [40, 35]]
+    Ex result set: obj.headers = [PTS, MIN, NAME]
+                   obj.rowSet = [[25, 37, "James Harden"], [40, 35, "Stephen Curry"]]
 
-	Ex cleanedData = [{PTS: 25, MIN: 37}, {PTS: 40, MIN: 35}]
+	Ex cleanedData = [{PTS: 25, MIN: 37, NAME: "James Harden}, 
+                      {PTS: 40, MIN: 35, NAME: "Stephen Curry}]
 
 
 # Tests
@@ -187,9 +200,15 @@ To test the game node:
 
 ## Develop an interactive website that displays a game day's scoreboard. Download the [flow](flows/scoreboard.json). 
 
-![scoreboard-flow](screenshots/scoreboard-flow.png?raw=true "scoreboard-flow")
+![scoreboard-flow](screenshots/scoreboard-flow2.png?raw=true "scoreboard-flow")
 
 ![scoreboard](screenshots/scoreboard.png?raw=true "scoreboard")
+
+## Display a game's box score with live updates. Download the [flow](flows/box-score.json). 
+
+![box-score-flow](screenshots/box-score-flow2.png?raw=true "box-score-flow")
+
+![box-score](screenshots/box-score2.png?raw=true "box-score")
 
 ## Develop an interactive website that displays a team's best lineups. Download the [flow](flows/lineups.json). 
 
@@ -202,12 +221,6 @@ To test the game node:
 ![standings-flow](screenshots/standings-flow.png?raw=true "standings-flow")
 
 ![standings](screenshots/standings.png?raw=true "standings")
-
-## Display a game's box score. Download the [flow](flows/box-score.json). 
-
-![box-score-flow](screenshots/box-score-flow.png?raw=true "box-score-flow")
-
-![box-score](screenshots/box-score.png?raw=true "box-score")
 
 ## Display a game's play-by-play. Download the [flow](flows/play-by-play.json). 
 

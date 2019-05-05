@@ -19,8 +19,7 @@ function getPlayerMethodDict() {
         "profile": NBA.stats.playerInfo,
         "stats": NBA.stats.playerProfile,
         "shot chart": NBA.stats.shots,
-        "splits": NBA.stats.playerSplits,
-        "shot dashboard": NBA.stats.playerShooting
+        "splits": NBA.stats.playerSplits
     }
     return method_dict;
 }

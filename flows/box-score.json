@@ -1,176 +1,367 @@
 [
     {
-        "id": "ace44d9.003b0b",
+        "id": "e7adc05f.1a88b",
+        "type": "game",
+        "z": "3a1aa534.098f4a",
+        "name": "box score",
+        "game_id": "{{game_id}}",
+        "game_type": "box score",
+        "game_date": "{{date}}",
+        "live": "true",
+        "x": 760,
+        "y": 100,
+        "wires": [
+            [
+                "5cc5047d.1dcebc"
+            ]
+        ]
+    },
+    {
+        "id": "5cc5047d.1dcebc",
+        "type": "function",
+        "z": "3a1aa534.098f4a",
+        "name": "format",
+        "func": "msg.script = \"boxscore.js\";\nmsg.css = \"boxscore.css\";\n\nmsg.payload = {\n    \"home_roster\": msg.payload.sports_content.game.home.players.player,\n    \"visitor_roster\": msg.payload.sports_content.game.visitor.players.player,\n    \"home_totals\": msg.payload.sports_content.game.home.stats,\n    \"visitor_totals\": msg.payload.sports_content.game.visitor.stats,\n    \"home_team\": msg.payload.sports_content.game.home.team_key,\n    \"visitor_team\": msg.payload.sports_content.game.visitor.team_key,\n    \"game_date\": msg.payload.sports_content.game.date\n}\n\nmsg.date = msg.date.replace(/(\\d{4})(\\d{2})(\\d{2})/, \"$1-$2-$3\")\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 890,
+        "y": 100,
+        "wires": [
+            [
+                "eac5ad1d.051a18"
+            ]
+        ]
+    },
+    {
+        "id": "51378bd5.6ced14",
         "type": "http in",
-        "z": "60f52c2e.45c274",
+        "z": "3a1aa534.098f4a",
         "name": "",
-        "url": "/boxscore/:gameId",
+        "url": "/boxscore/:game_id",
         "method": "get",
         "upload": false,
         "swaggerDoc": "",
-        "x": 180,
-        "y": 80,
+        "x": 130,
+        "y": 40,
         "wires": [
             [
-                "b141d139.2d3d4"
+                "52c57a0e.f8824c"
             ]
         ]
     },
     {
-        "id": "b141d139.2d3d4",
-        "type": "game",
-        "z": "60f52c2e.45c274",
-        "name": "",
-        "game_id": "{{req.params.gameId}}",
-        "game_type": "box score",
-        "x": 440,
-        "y": 80,
-        "wires": [
-            [
-                "f85e5834.ac8938"
-            ]
-        ]
-    },
-    {
-        "id": "534d8bd2.313a24",
+        "id": "711af2fa.5fdc7c",
         "type": "template",
-        "z": "60f52c2e.45c274",
+        "z": "3a1aa534.098f4a",
         "name": "HTML",
         "field": "payload",
         "fieldType": "msg",
         "format": "handlebars",
         "syntax": "mustache",
-        "template": "<head>\n    <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css\" integrity=\"sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T\" crossorigin=\"anonymous\">\n    <link rel=\"stylesheet\" type=\"text/css\" href=\"/public/{{css}}\">\n</head>\n\n<body>\n\n    <div id=\"buttons-outer-div\" class=\"text-center\">\n        <div id=\"box-score-buttons\" class=\"btn-group btn-group-toggle\" data-toggle=\"buttons\">\n          <label class=\"btn btn-secondary active\">\n            <input type=\"radio\" name=\"options\" id=\"homeButton\" autocomplete=\"off\" checked onchange=\"updateBoxScore(event);\"> {{payload.home_team}}\n          </label>\n          <label class=\"btn btn-secondary\">\n            <input type=\"radio\" name=\"options\" id=\"visitorButton\" autocomplete=\"off\" onchange=\"updateBoxScore(event);\"> {{payload.visitor_team}}\n          </label>\n        </div>\n    </div>\n    \n    <p id=\"game-date\" class=\"text-right\" >{{payload.game_date}}</p>\n    \n    <table id=\"home-table\" class=\"table box-score\">\n        <thead>\n            <tr>\n                <th>{{payload.home_team}}</th>\n                <th>Min</th>\n                <th>FG</th>\n                <th>FT</th>\n                <th>3PT</th>\n                <th>+/-</th>\n                <th>OR</th>\n                <th>Reb</th>\n                <th>A</th>\n                <th>Blk</th>\n                <th>Stl</th>\n                <th>TO</th>\n                <th>PF</th>\n                <th>Pts</th>\n            </tr>\n        </thead>\n        <tbody>\n            {{#payload.home_roster}}\n                <tr>\n                    <td>{{PLAYER_NAME}}</td>\n                    <td>{{MIN}}</td>\n                    <td>{{FGM}}-{{FGA}}</td>\n                    <td>{{FTM}}-{{FTA}}</td>\n                    <td>{{FG3M}}-{{FG3A}}</td>\n                    <td>{{PLUS_MINUS}}</td>\n                    <td>{{OREB}}</td>\n                    <td>{{REB}}</td>\n                    <td>{{AST}}</td>\n                    <td>{{BLK}}</td>\n                    <td>{{STL}}</td>\n                    <td>{{TO}}</td>\n                    <td>{{PF}}</td>\n                    <td>{{PTS}}</td>\n                </tr>\n            {{/payload.home_roster}}\n        </tbody>\n        <tfoot>\n            <tr>\n                <td>Totals</td>\n                <td>{{payload.home_totals.MIN}}</td>\n                <td>{{payload.home_totals.FGM}}-{{payload.home_totals.FGA}}</td>\n                <td>{{payload.home_totals.FTM}}-{{payload.home_totals.FTA}}</td>\n                <td>{{payload.home_totals.FG3M}}-{{payload.home_totals.FG3A}}</td>\n                <td>{{payload.home_totals.PLUS_MINUS}}</td>\n                <td>{{payload.home_totals.OREB}}</td>\n                <td>{{payload.home_totals.REB}}</td>\n                <td>{{payload.home_totals.AST}}</td>\n                <td>{{payload.home_totals.BLK}}</td>\n                <td>{{payload.home_totals.STL}}</td>\n                <td>{{payload.home_totals.TO}}</td>\n                <td>{{payload.home_totals.PF}}</td>\n                <td>{{payload.home_totals.PTS}}</td>\n            </tr>\n        </tfoot>\n    </table>\n    \n    <table id=\"visitor-table\" class=\"table box-score\">\n        <thead>\n            <tr>\n                <th>{{payload.visitor_team}}</th>\n                <th>Min</th>\n                <th>FG</th>\n                <th>FT</th>\n                <th>3PT</th>\n                <th>+/-</th>\n                <th>OR</th>\n                <th>Reb</th>\n                <th>A</th>\n                <th>Blk</th>\n                <th>Stl</th>\n                <th>TO</th>\n                <th>PF</th>\n                <th>Pts</th>\n            </tr>\n        </thead>\n        <tbody>\n            {{#payload.visitor_roster}}\n                <tr>\n                    <td>{{PLAYER_NAME}}</td>\n                    <td>{{MIN}}</td>\n                    <td>{{FGM}}-{{FGA}}</td>\n                    <td>{{FTM}}-{{FTA}}</td>\n                    <td>{{FG3M}}-{{FG3A}}</td>\n                    <td>{{PLUS_MINUS}}</td>\n                    <td>{{OREB}}</td>\n                    <td>{{REB}}</td>\n                    <td>{{AST}}</td>\n                    <td>{{BLK}}</td>\n                    <td>{{STL}}</td>\n                    <td>{{TO}}</td>\n                    <td>{{PF}}</td>\n                    <td>{{PTS}}</td>\n                </tr>\n            {{/payload.visitor_roster}}\n        </tbody>\n        <tfoot>\n            <tr>\n                <td>Totals</td>\n                <td>{{payload.visitor_totals.MIN}}</td>\n                <td>{{payload.visitor_totals.FGM}}-{{payload.visitor_totals.FGA}}</td>\n                <td>{{payload.visitor_totals.FTM}}-{{payload.visitor_totals.FTA}}</td>\n                <td>{{payload.visitor_totals.FG3M}}-{{payload.visitor_totals.FG3A}}</td>\n                <td>{{payload.visitor_totals.PLUS_MINUS}}</td>\n                <td>{{payload.visitor_totals.OREB}}</td>\n                <td>{{payload.visitor_totals.REB}}</td>\n                <td>{{payload.visitor_totals.AST}}</td>\n                <td>{{payload.visitor_totals.BLK}}</td>\n                <td>{{payload.visitor_totals.STL}}</td>\n                <td>{{payload.visitor_totals.TO}}</td>\n                <td>{{payload.visitor_totals.PF}}</td>\n                <td>{{payload.visitor_totals.PTS}}</td>\n            </tr>\n        </tfoot>\n    </table>\n    \n    <script type=\"text/javascript\" src=\"/public/{{script}}\"></script>\n</body>",
+        "template": "<div id=\"buttons-outer-div\" class=\"text-center\">\n    <div id=\"box-score-buttons\" class=\"btn-group btn-group-toggle\" data-toggle=\"buttons\">\n      <label class=\"btn btn-secondary active\">\n        <input type=\"radio\" name=\"options\" id=\"homeButton\" autocomplete=\"off\" checked onchange=\"updateBoxScore(event);\"> {{payload.home_team}}\n      </label>\n      <label class=\"btn btn-secondary\">\n        <input type=\"radio\" name=\"options\" id=\"visitorButton\" autocomplete=\"off\" onchange=\"updateBoxScore(event);\"> {{payload.visitor_team}}\n      </label>\n    </div>\n</div>\n\n<label id=\"live-label\" for=\"live-updates\">Live updates</label>\n<input id=\"live-updates\" type=\"checkbox\" checked data-toggle=\"toggle\">\n\n<p id=\"game-date\" class=\"d-none d-sm-block text-right\" >{{date}}</p>\n<p id=\"game-id\" class=\"d-none\">{{req.params.game_id}}</p>\n\n\n<table id=\"home-table\" class=\"table box-score\">\n    <thead>\n        <tr>\n            <th>{{payload.home_team}}</th>\n            <th>Min</th>\n            <th>FG</th>\n            <th class=\"d-none d-sm-table-cell\">FT</th>\n            <th class=\"d-none d-sm-table-cell\">3PT</th>\n            <th class=\"d-none d-sm-table-cell\">+/-</th>\n            <th class=\"d-none d-sm-table-cell\">OR</th>\n            <th class=\"d-none d-sm-table-cell\">Reb</th>\n            <th class=\"d-none d-sm-table-cell\">A</th>\n            <th class=\"d-none d-sm-table-cell\">Blk</th>\n            <th class=\"d-none d-sm-table-cell\">Stl</th>\n            <th class=\"d-none d-sm-table-cell\">TO</th>\n            <th class=\"d-none d-sm-table-cell\">PF</th>\n            <th>Pts</th>\n        </tr>\n    </thead>\n    <tbody id=\"{{payload.home_team}}-tbody\">\n        {{#payload.home_roster}}\n            <tr>\n                <td>{{first_name}} {{last_name}}</td>\n                <td>{{minutes}}</td>\n                <td>{{field_goals_made}}-{{field_goals_attempted}}</td>\n                <td class=\"d-none d-sm-table-cell\">{{free_throws_made}}-{{free_throws_attempted}}</td>\n                <td class=\"d-none d-sm-table-cell\">{{three_pointers_made}}-{{three_pointers_attempted}}</td>\n                <td class=\"d-none d-sm-table-cell\">{{plus_minus}}</td>\n                <td class=\"d-none d-sm-table-cell\">{{rebounds_offensive}}</td>\n                <td class=\"d-none d-sm-table-cell\">{{rebounds_defensive}}</td>\n                <td class=\"d-none d-sm-table-cell\">{{assists}}</td>\n                <td class=\"d-none d-sm-table-cell\">{{blocks}}</td>\n                <td class=\"d-none d-sm-table-cell\">{{steals}}</td>\n                <td class=\"d-none d-sm-table-cell\">{{turnovers}}</td>\n                <td class=\"d-none d-sm-table-cell\">{{fouls}}</td>\n                <td>{{points}}</td>\n            </tr>\n        {{/payload.home_roster}}\n    </tbody>\n    <tfoot id=\"{{payload.home_team}}-tfoot\">\n        <tr>\n            <td>Totals</td>\n            <td>{{payload.home_totals.minutes}}</td>\n            <td>{{payload.home_totals.field_goals_made}}-{{payload.home_totals.field_goals_attempted}}</td>\n            <td class=\"d-none d-sm-table-cell\">{{payload.home_totals.free_throws_made}}-{{payload.home_totals.free_throws_attempted}}</td>\n            <td class=\"d-none d-sm-table-cell\">{{payload.home_totals.three_pointers_made}}-{{payload.home_totals.three_pointers_attempted}}</td>\n            <td class=\"d-none d-sm-table-cell\">{{payload.home_totals.plus_minus}}</td>\n            <td class=\"d-none d-sm-table-cell\">{{payload.home_totals.rebounds_offensive}}</td>\n            <td class=\"d-none d-sm-table-cell\">{{payload.home_totals.rebounds_defensive}}</td>\n            <td class=\"d-none d-sm-table-cell\">{{payload.home_totals.assists}}</td>\n            <td class=\"d-none d-sm-table-cell\">{{payload.home_totals.blocks}}</td>\n            <td class=\"d-none d-sm-table-cell\">{{payload.home_totals.steals}}</td>\n            <td class=\"d-none d-sm-table-cell\">{{payload.home_totals.turnovers}}</td>\n            <td class=\"d-none d-sm-table-cell\">{{payload.home_totals.fouls}}</td>\n            <td>{{payload.home_totals.points}}</td>\n        </tr>\n    </tfoot>\n</table>\n\n<table id=\"visitor-table\" class=\"table box-score\">\n    <thead>\n        <tr>\n            <th>{{payload.visitor_team}}</th>\n            <th>Min</th>\n            <th>FG</th>\n            <th class=\"d-none d-sm-table-cell\">FT</th>\n            <th class=\"d-none d-sm-table-cell\">3PT</th>\n            <th class=\"d-none d-sm-table-cell\">+/-</th>\n            <th class=\"d-none d-sm-table-cell\">OR</th>\n            <th class=\"d-none d-sm-table-cell\">Reb</th>\n            <th class=\"d-none d-sm-table-cell\">A</th>\n            <th class=\"d-none d-sm-table-cell\">Blk</th>\n            <th class=\"d-none d-sm-table-cell\">Stl</th>\n            <th class=\"d-none d-sm-table-cell\">TO</th>\n            <th class=\"d-none d-sm-table-cell\">PF</th>\n            <th>Pts</th>\n        </tr>\n    </thead>\n    <tbody id=\"{{payload.visitor_team}}-tbody\">\n        {{#payload.visitor_roster}}\n            <tr>\n                <td>{{first_name}} {{last_name}}</td>\n                <td>{{minutes}}</td>\n                <td>{{field_goals_made}}-{{field_goals_attempted}}</td>\n                <td class=\"d-none d-sm-table-cell\">{{free_throws_made}}-{{free_throws_attempted}}</td>\n                <td class=\"d-none d-sm-table-cell\">{{three_pointers_made}}-{{three_pointers_attempted}}</td>\n                <td class=\"d-none d-sm-table-cell\">{{plus_minus}}</td>\n                <td class=\"d-none d-sm-table-cell\">{{rebounds_offensive}}</td>\n                <td class=\"d-none d-sm-table-cell\">{{rebounds_defensive}}</td>\n                <td class=\"d-none d-sm-table-cell\">{{assists}}</td>\n                <td class=\"d-none d-sm-table-cell\">{{blocks}}</td>\n                <td class=\"d-none d-sm-table-cell\">{{steals}}</td>\n                <td class=\"d-none d-sm-table-cell\">{{turnovers}}</td>\n                <td class=\"d-none d-sm-table-cell\">{{fouls}}</td>\n                <td>{{points}}</td>\n            </tr>\n        {{/payload.visitor_roster}}\n    </tbody>\n    <tfoot id=\"{{payload.visitor_team}}-tfoot\">\n        <tr>\n            <td>Totals</td>\n            <td>{{payload.visitor_totals.minutes}}</td>\n            <td>{{payload.visitor_totals.field_goals_made}}-{{payload.visitor_totals.field_goals_attempted}}</td>\n            <td class=\"d-none d-sm-table-cell\">{{payload.visitor_totals.free_throws_made}}-{{payload.visitor_totals.free_throws_attempted}}</td>\n            <td class=\"d-none d-sm-table-cell\">{{payload.visitor_totals.three_pointers_made}}-{{payload.visitor_totals.three_pointers_attempted}}</td>\n            <td class=\"d-none d-sm-table-cell\">{{payload.visitor_totals.plus_minus}}</td>\n            <td class=\"d-none d-sm-table-cell\">{{payload.visitor_totals.rebounds_offensive}}</td>\n            <td class=\"d-none d-sm-table-cell\">{{payload.visitor_totals.rebounds_defensive}}</td>\n            <td class=\"d-none d-sm-table-cell\">{{payload.visitor_totals.assists}}</td>\n            <td class=\"d-none d-sm-table-cell\">{{payload.visitor_totals.blocks}}</td>\n            <td class=\"d-none d-sm-table-cell\">{{payload.visitor_totals.steals}}</td>\n            <td class=\"d-none d-sm-table-cell\">{{payload.visitor_totals.turnovers}}</td>\n            <td class=\"d-none d-sm-table-cell\">{{payload.visitor_totals.fouls}}</td>\n            <td>{{payload.visitor_totals.points}}</td>\n        </tr>\n    </tfoot>\n</table>\n\n\n\n",
         "output": "str",
-        "x": 850,
-        "y": 80,
+        "x": 1190,
+        "y": 40,
         "wires": [
             [
-                "3e4d038.b46e1fc"
+                "9bb29777.a44a08"
             ]
         ]
     },
     {
-        "id": "f85e5834.ac8938",
-        "type": "function",
-        "z": "60f52c2e.45c274",
-        "name": "format response",
-        "func": "var player_stats = msg.payload.playerStats;\nvar game_summary = msg.payload.gameSummary;\nvar team_stats = msg.payload.teamStats;\n\nvar home_roster = player_stats.filter((player => player.TEAM_ID === game_summary.HOME_TEAM_ID ));\nvar visitor_roster = player_stats.filter((player => player.TEAM_ID === game_summary.VISITOR_TEAM_ID ));\nvar home_totals = team_stats.filter((team => team.TEAM_ID === game_summary.HOME_TEAM_ID));\nvar visitor_totals = team_stats.filter((team => team.TEAM_ID === game_summary.VISITOR_TEAM_ID));\n\n\nmsg.script = \"boxscore.js\";\nmsg.css = \"boxscore.css\";\n\nmsg.payload = {\n    \"home_roster\": home_roster,\n    \"visitor_roster\": visitor_roster,\n    \"home_totals\": home_totals[0],\n    \"visitor_totals\": visitor_totals[0],\n    \"home_team\": home_roster[0].TEAM_ABBREVIATION,\n    \"visitor_team\": visitor_roster[0].TEAM_ABBREVIATION,\n    \"game_date\": msg.payload.gameInfo.GAME_DATE\n}\n\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "x": 660,
-        "y": 80,
-        "wires": [
-            [
-                "534d8bd2.313a24"
-            ]
-        ]
-    },
-    {
-        "id": "8fe2f046.444b4",
+        "id": "94fb38fd.1154c8",
         "type": "http in",
-        "z": "60f52c2e.45c274",
+        "z": "3a1aa534.098f4a",
         "name": "",
         "url": "/public/boxscore.js",
         "method": "get",
         "upload": false,
         "swaggerDoc": "",
-        "x": 180,
-        "y": 180,
+        "x": 120,
+        "y": 300,
         "wires": [
             [
-                "f473a25d.9b399"
+                "e3d1dbd9.4d15c8"
             ]
         ]
     },
     {
-        "id": "f473a25d.9b399",
+        "id": "e3d1dbd9.4d15c8",
         "type": "template",
-        "z": "60f52c2e.45c274",
+        "z": "3a1aa534.098f4a",
         "name": "javascript",
         "field": "payload",
         "fieldType": "msg",
         "format": "javascript",
         "syntax": "mustache",
-        "template": "function resetButton(id) {\n    var button = document.getElementById(id);\n    console.log(button);\n    button.parentNode.className = \"btn btn-secondary\";\n    button.removeAttribute(\"checked\");\n    console.log(button);\n}\n\nfunction resetButtons() {\n    resetButton(\"homeButton\");\n    resetButton(\"visitorButton\");\n}\n\nfunction targetButton(button) {\n    button.parentNode.className = \"btn btn-secondary active\";\n}\n\nfunction hideTable(id){\n    var table = document.getElementById(id);\n    table.style.display = \"none\";\n}\n\nfunction hideTables() {\n    hideTable(\"home-table\");\n    hideTable(\"visitor-table\");\n}\n\nfunction showTable(id) {\n    var table = document.getElementById(id);\n    table.style.display = \"table\";\n}\n\nfunction updateBoxScore(event) {\n    event.preventDefault(); \n    //resetButtons();\n    hideTables(); \n    //targetButton(event.target);\n    if (event.target.id === \"homeButton\") {\n        showTable(\"home-table\");\n    } else {\n        showTable(\"visitor-table\");\n    }\n}\n\n// second\n\nasync function updateDate(event) {\n    event.preventDefault(); \n    var date = document.getElementById(\"date\").value;\n    var body = {\"date\": date};\n    var response = await fetch(\"/boxscore\", {\n        \"method\": \"POST\", \n        \"body\": JSON.stringify(body),\n        \"headers\": {\"Content-Type\": \"application/json\"}\n    })\n    // var data = await response.json()\n    // emptyTable(); \n    // addDataToTable(data);\n}\n\n\n\n\n",
+        "template": "function resetButton(id) {\n    var button = document.getElementById(id);\n    console.log(button);\n    button.parentNode.className = \"btn btn-secondary\";\n    button.removeAttribute(\"checked\");\n    console.log(button);\n}\n\nfunction resetButtons() {\n    resetButton(\"homeButton\");\n    resetButton(\"visitorButton\");\n}\n\nfunction targetButton(button) {\n    button.parentNode.className = \"btn btn-secondary active\";\n}\n\nfunction hideTable(id){\n    var table = document.getElementById(id);\n    table.style.display = \"none\";\n}\n\nfunction hideTables() {\n    hideTable(\"home-table\");\n    hideTable(\"visitor-table\");\n}\n\nfunction showTable(id) {\n    var table = document.getElementById(id);\n    table.style.display = \"table\";\n}\n\nfunction updateBoxScore(event) {\n    event.preventDefault(); \n    //resetButtons();\n    hideTables(); \n    //targetButton(event.target);\n    if (event.target.id === \"homeButton\") {\n        showTable(\"home-table\");\n    } else {\n        showTable(\"visitor-table\");\n    }\n}\n\nasync function getNewBoxscore() {\n    var checkbox = document.getElementById(\"live-updates\");\n    if (!checkbox.checked) {\n        console.log(\"returning\");\n        return; \n    }\n    \n    var game_id = document.getElementById(\"game-id\").innerText;\n    var body = {\"game_id\": game_id};\n    var response = await fetch(\"/boxscore\", {\n        \"method\": \"POST\", \n        \"body\": JSON.stringify(body),\n        \"headers\": {\"Content-Type\": \"application/json\"}\n    })\n    var data = await response.json();\n    updateTeams(data); \n}\n\nfunction updateTeams(data) {\n    updateTeamPlayers(data.home_roster, data.home_team);\n    updateTeamPlayers(data.visitor_roster, data.visitor_team);\n    updateTeamTotals(data.home_totals, data.home_team);\n    updateTeamTotals(data.visitor_totals, data.visitor_team);\n}\n\nfunction updateTeamTotals(totals, team_abbr) {\n    var tfoot = document.getElementById(team_abbr + \"-tfoot\");\n    var row = tfoot.rows[0]; \n    row.cells[2].innerText = totals.field_goals_made + \"-\" + totals.field_goals_attempted; \n    row.cells[3].innerText = totals.free_throws_made + \"-\" + totals.free_throws_attempted;\n    row.cells[4].innerText = totals.three_pointers_made + \"-\" + totals.three_pointers_attempted;\n    row.cells[6].innerText = totals.rebounds_offensive; \n    row.cells[7].innerText = totals.rebounds_defensive; \n    row.cells[8].innerText = totals.assists; \n    row.cells[9].innerText = totals.blocks; \n    row.cells[10].innerText = totals.steals; \n    row.cells[11].innerText = totals.turnovers; \n    row.cells[12].innerText = totals.fouls; \n    row.cells[13].innerText = totals.points; \n}\n\nfunction updateTeamPlayers(players, team_abbr) {\n    var tbody = document.getElementById(team_abbr + \"-tbody\");\n    var rows = Array.from(tbody.rows); \n    rows.forEach((row, i) => {\n        row.cells[1].innerText = players[i].minutes; \n        row.cells[2].innerText = players[i].field_goals_made + \"-\" + players[i].field_goals_attempted; \n        row.cells[3].innerText = players[i].free_throws_made + \"-\" + players[i].free_throws_attempted;\n        row.cells[4].innerText = players[i].three_pointers_made + \"-\" + players[i].three_pointers_attempted;\n        row.cells[5].innerText = players[i].plus_minus; \n        row.cells[6].innerText = players[i].rebounds_offensive; \n        row.cells[7].innerText = players[i].rebounds_defensive; \n        row.cells[8].innerText = players[i].assists; \n        row.cells[9].innerText = players[i].blocks; \n        row.cells[10].innerText = players[i].steals; \n        row.cells[11].innerText = players[i].turnovers; \n        row.cells[12].innerText = players[i].fouls; \n        row.cells[13].innerText = players[i].points; \n    })\n}\n\nwindow.setInterval(getNewBoxscore, 5000);\n\n\n\n",
         "output": "str",
-        "x": 440,
-        "y": 180,
+        "x": 380,
+        "y": 300,
         "wires": [
             [
-                "d645a15b.d357c"
+                "66991a24.00ec34"
             ]
         ]
     },
     {
-        "id": "d645a15b.d357c",
+        "id": "66991a24.00ec34",
         "type": "http response",
-        "z": "60f52c2e.45c274",
+        "z": "3a1aa534.098f4a",
         "name": "",
         "statusCode": "",
         "headers": {},
-        "x": 640,
-        "y": 180,
+        "x": 580,
+        "y": 300,
         "wires": []
     },
     {
-        "id": "21bf7407.f10cdc",
+        "id": "cea30098.0864a",
         "type": "template",
-        "z": "60f52c2e.45c274",
+        "z": "3a1aa534.098f4a",
         "name": "css",
         "field": "payload",
         "fieldType": "msg",
         "format": "css",
         "syntax": "mustache",
-        "template": ".box-score {\n    width:75%;\n    margin: auto;\n}\n\n.btn-secondary.focus, .btn-secondary:focus, .btn-secondary.focus, .btn-secondary:focus {\n    outline: none;\n    box-shadow: none;\n}\n\n#game-date {\n    margin-right: 12.5%;\n    margin-top: -2rem;\n}\n\n#visitor-table {\n    display: none;\n}\n#box-score-buttons {\n    margin: auto;\n    width: 25%;\n    margin: 2vh 0vh 2vh 0vh;\n}",
+        "template": ".box-score {\n    width:75%;\n    margin: auto;\n}\n\n.btn-secondary.focus, .btn-secondary:focus, .btn-secondary.focus, .btn-secondary:focus {\n    outline: none;\n    box-shadow: none;\n}\n\n#live-label {\n    margin-left: 12.5%;\n}\n\n#game-date {\n    margin-right: 12.5%;\n    margin-top: -2rem;\n}\n\n#visitor-table {\n    display: none;\n}\n#box-score-buttons {\n    margin: auto;\n    width: 25%;\n    margin: 2vh 0vh -2vh 0vh;\n}",
         "output": "str",
-        "x": 430,
-        "y": 240,
+        "x": 370,
+        "y": 360,
         "wires": [
             [
-                "7ed6174.2ba40e8"
+                "985fc881.ecfa78"
             ]
         ]
     },
     {
-        "id": "9fcb82d0.c28d7",
+        "id": "163e097c.f251b7",
         "type": "http in",
-        "z": "60f52c2e.45c274",
+        "z": "3a1aa534.098f4a",
         "name": "",
         "url": "/public/boxscore.css",
         "method": "get",
         "upload": false,
         "swaggerDoc": "",
-        "x": 190,
-        "y": 240,
+        "x": 130,
+        "y": 360,
         "wires": [
             [
-                "21bf7407.f10cdc"
+                "cea30098.0864a"
             ]
         ]
     },
     {
-        "id": "7ed6174.2ba40e8",
+        "id": "985fc881.ecfa78",
         "type": "http response",
-        "z": "60f52c2e.45c274",
+        "z": "3a1aa534.098f4a",
         "name": "",
         "statusCode": "",
         "headers": {
             "Content-Type": "text/css"
         },
-        "x": 650,
-        "y": 240,
+        "x": 590,
+        "y": 360,
         "wires": []
     },
     {
-        "id": "3e4d038.b46e1fc",
+        "id": "22ff5a99.062966",
+        "type": "http in",
+        "z": "3a1aa534.098f4a",
+        "name": "",
+        "url": "/boxscore",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 100,
+        "y": 160,
+        "wires": [
+            [
+                "52c57a0e.f8824c"
+            ]
+        ]
+    },
+    {
+        "id": "ac4edd1e.19139",
         "type": "http response",
-        "z": "60f52c2e.45c274",
+        "z": "3a1aa534.098f4a",
         "name": "",
         "statusCode": "",
         "headers": {},
-        "x": 1010,
-        "y": 80,
+        "x": 1190,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "eac5ad1d.051a18",
+        "type": "switch",
+        "z": "3a1aa534.098f4a",
+        "name": "req.method",
+        "property": "req.method",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "GET",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "POST",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1030,
+        "y": 100,
+        "wires": [
+            [
+                "711af2fa.5fdc7c"
+            ],
+            [
+                "ac4edd1e.19139"
+            ]
+        ]
+    },
+    {
+        "id": "52c57a0e.f8824c",
+        "type": "function",
+        "z": "3a1aa534.098f4a",
+        "name": "get id",
+        "func": "msg.game_id = (msg.req.method === \"GET\") ? msg.req.params.game_id : msg.req.body.game_id;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 350,
+        "y": 100,
+        "wires": [
+            [
+                "6ce48212.bfbacc"
+            ]
+        ]
+    },
+    {
+        "id": "6ce48212.bfbacc",
+        "type": "league",
+        "z": "3a1aa534.098f4a",
+        "name": "schedule",
+        "league_type": "schedule",
+        "season": "2018-19",
+        "season_type": "Regular Season",
+        "game_date": "",
+        "per_mode": "PerGame",
+        "stat_category": "PTS",
+        "sorter": "PTS",
+        "player_or_team": "Player",
+        "measure_type": "Base",
+        "ahead_behind": "Ahead or Behind",
+        "point_diff": "",
+        "clutch_time": "Last 5 Minutes",
+        "group_quantity": "5",
+        "pt_measure_type": "CatchShoot",
+        "close_def_dist_range": "",
+        "dribble_range": "",
+        "touch_time_range": "",
+        "shot_clock_range": "",
+        "general_range": "",
+        "x": 480,
+        "y": 100,
+        "wires": [
+            [
+                "165e5d24.5e500b"
+            ]
+        ]
+    },
+    {
+        "id": "165e5d24.5e500b",
+        "type": "function",
+        "z": "3a1aa534.098f4a",
+        "name": "get date",
+        "func": "var game = msg.payload.league.standard.find(g => g.gameId === msg.game_id); \n\nmsg.date = game.startDateEastern; \n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 620,
+        "y": 100,
+        "wires": [
+            [
+                "e7adc05f.1a88b"
+            ]
+        ]
+    },
+    {
+        "id": "9bb29777.a44a08",
+        "type": "link out",
+        "z": "3a1aa534.098f4a",
+        "name": "Box Score",
+        "links": [
+            "3867cf53.b064e",
+            "13cbe348.6a8f1d"
+        ],
+        "x": 1315,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "13cbe348.6a8f1d",
+        "type": "link in",
+        "z": "3a1aa534.098f4a",
+        "name": "Render",
+        "links": [
+            "6f04b46b.aebf4c",
+            "ce87bc5c.6da2",
+            "1149517.f7753af",
+            "3e961365.f7699c",
+            "b5ec5b43.b16828",
+            "609d03f1.35666c",
+            "8caa9b06.428e28",
+            "96990762.9b1898",
+            "a167e41e.187f58",
+            "3280a0a0.92805",
+            "dc05fa7c.6de4d8",
+            "dbfa7c7.675528",
+            "8277d77b.0f2798",
+            "2fa36897.334258",
+            "cf043fe5.aa0cf",
+            "9bb29777.a44a08",
+            "73e4455.40aeebc"
+        ],
+        "x": 35,
+        "y": 480,
+        "wires": [
+            [
+                "e398304e.514998"
+            ]
+        ]
+    },
+    {
+        "id": "e398304e.514998",
+        "type": "template",
+        "z": "3a1aa534.098f4a",
+        "name": "main template",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<!doctype html>\n<html lang=\"en\">\n  <!-- Using https://getbootstrap.com/docs/4.0/examples/jumbotron/# as a framework-->\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"> \n    <meta name=\"description\" content=\"\">\n    <meta name=\"author\" content=\"\">\n    {{!--<link rel=\"icon\" href=\"../../../../favicon.ico\">--}}\n\n    <title>NBA</title>\n\n    <!-- Bootstrap core CSS -->\n    <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css\" integrity=\"sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T\" crossorigin=\"anonymous\">\n    <!-- Custom styles for this template -->\n    <link rel=\"stylesheet\" type=\"text/css\" href=\"/public/{{css}}\">\n    \n    <style>\n        body {\n          padding-top: 5rem;\n        }\n        @media (max-width: 575.98px) {\n            .display-3 {\n                font-size: 1.75rem;\n                font-weight: 300;\n                line-height: 1.0;\n            }\n        }\n    </style>\n  </head>\n\n  <body>\n\n    <nav class=\"navbar navbar-expand-md navbar-dark fixed-top bg-dark\">\n      <a class=\"navbar-brand\" href=\"#\"></a>\n      <button class=\"navbar-toggler\" type=\"button\" data-toggle=\"collapse\" data-target=\"#navigationbar\" aria-controls=\"navbarsExampleDefault\" aria-expanded=\"false\" aria-label=\"Toggle navigation\">\n        <span class=\"navbar-toggler-icon\"></span>\n      </button>\n      \n      <div class=\"collapse navbar-collapse\" id=\"navigationbar\">\n        <ul class=\"navbar-nav mr-auto\">\n          <li class=\"nav-item active\">\n            <a class=\"nav-link\" href=\"#\">Home <span class=\"sr-only\" target=\"_blank\">(current)</span></a>\n          </li>\n          <li class=\"nav-item\">\n            <a class=\"nav-link\" href=\"https://github.com/jcostello93/node-red-contrib-nba\" target=\"_blank\">GitHub</a>\n          </li>\n          <li class=\"nav-item\">\n            <a class=\"nav-link\" href=\"https://github.com/jcostello93/node-red-contrib-node-reddit/blob/master/README.md#example-flows\" target=\"_blank\">Example flows</a>\n          </li>\n          <li class=\"nav-item\">\n            <a class=\"nav-link\" href=\"https://github.com/jcostello93/node-red-contrib-node-reddit/wiki\" target=\"_blank\">Docs</a>\n          </li>\n          <li class=\"nav-item\">\n            <a class=\"nav-link\" href=\"https://npmjs.com/package/node-red-contrib-node-reddit\" target=\"_blank\">NPM</a>\n          </li>\n          <li class=\"nav-item\">\n            <a class=\"nav-link\" href=\"https://node-reddit-demo.eu-gb.mybluemix.net/red\" target=\"_blank\">Demo app</a>\n          </li>\n          <li class=\"nav-item dropdown\">\n            <a class=\"nav-link dropdown-toggle\" id=\"dropdown01\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">Example clients</a>\n            <div class=\"dropdown-menu\" aria-labelledby=\"dropdown01\">\n              <a class=\"dropdown-item\" href=\"/lineups\">Lineups</a>\n              <a class=\"dropdown-item\" href=\"/scoreboard\">Scoreboard</a>\n              <a class=\"dropdown-item\" href=\"/standings\">Standings</a>\n            </div>\n          </li>\n        </ul>\n      </div>\n    </nav>\n\n    <main role=\"main\">\n        {{{payload}}}\n    </main>\n\n    <footer class=\"container\">\n      <p><a href=\"https://github.com/jcostello93/node-red-contrib-node-reddit/wiki#contributors\" target=\"_blank\">Contributors</a></p>\n    </footer>\n\n    <!-- Bootstrap core JavaScript\n    ================================================== -->\n    <!-- Placed at the end of the document so the pages load faster -->\n    <script type=\"text/javascript\" src=\"/public/{{script}}\"></script>\n    \n    <script src=\"https://code.jquery.com/jquery-3.3.1.slim.min.js\" integrity=\"sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo\" crossorigin=\"anonymous\"></script>\n    <script src=\"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js\" integrity=\"sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1\" crossorigin=\"anonymous\"></script>\n    <script src=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js\" integrity=\"sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM\" crossorigin=\"anonymous\"></script>\n  </body>\n</html>\n",
+        "output": "str",
+        "x": 175,
+        "y": 480,
+        "wires": [
+            [
+                "739d4ac0.19ba5c"
+            ]
+        ]
+    },
+    {
+        "id": "739d4ac0.19ba5c",
+        "type": "http response",
+        "z": "3a1aa534.098f4a",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 395,
+        "y": 480,
         "wires": []
     }
 ]

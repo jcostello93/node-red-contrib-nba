@@ -1,180 +1,130 @@
 [
     {
-        "id": "6666f333.f6378c",
+        "id": "4e89cc08.dc99f4",
         "type": "http in",
-        "z": "42c39222.3d0e5c",
+        "z": "27c9fb93.5d22f4",
         "name": "",
         "url": "/scoreboard",
         "method": "get",
         "upload": false,
         "swaggerDoc": "",
-        "x": 120,
+        "x": 100,
         "y": 80,
         "wires": [
             [
-                "df6d44ed.fc90a8"
+                "898a8a6b.39ed18"
             ]
         ]
     },
     {
-        "id": "637a5f2a.7ae64",
-        "type": "league",
-        "z": "42c39222.3d0e5c",
-        "name": "",
-        "league_type": "scoreboard",
-        "season": "2018-19",
-        "season_type": "Regular Season",
-        "game_date": "{{date}}",
-        "per_mode": "PerGame",
-        "player_team": "P",
-        "measure_type": "Base",
-        "ahead_behind": "Ahead or Behind",
-        "point_diff": 0,
-        "clutch_time": "Last 5 Minutes",
-        "group_quantity": "5",
-        "x": 530,
-        "y": 80,
-        "wires": [
-            [
-                "baceb97f.e96128"
-            ]
-        ]
-    },
-    {
-        "id": "baceb97f.e96128",
-        "type": "function",
-        "z": "42c39222.3d0e5c",
-        "name": "format response",
-        "func": "var scores = msg.payload.lineScore;\nvar header = msg.payload.gameHeader; \n\nvar response = [];\n\nheader.forEach((element, index, array) => {\n    var home = scores.find(team => team.teamId === element.homeTeamId);\n    var visitor = scores.find(team => team.teamId === element.visitorTeamId);\n    var obj = {\n        \"visitorIcon\": \"https://raw.githubusercontent.com/Arieg419/NBA_Scorecard/master/src/client/src/img/\" + visitor.teamAbbreviation + \".png\",\n        \"visitorTeam\": visitor.teamAbbreviation,\n        \"visitorPts\": visitor.pts,\n        \"homeTeam\": home.teamAbbreviation, \n        \"homePts\": home.pts,\n        \"homeIcon\": \"https://raw.githubusercontent.com/Arieg419/NBA_Scorecard/master/src/client/src/img/\" + home.teamAbbreviation + \".png\",\n        \"status\": element.gameStatusText,\n        \"gameId\": element.gameId\n    }\n    response.push(obj);\n});\n\nmsg.script = \"scoreboard.js\";\nmsg.css = \"scoreboard.css\";\nmsg.payload = response; \n\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "x": 740,
-        "y": 80,
-        "wires": [
-            [
-                "9f92928c.ac9dc"
-            ]
-        ]
-    },
-    {
-        "id": "9f92928c.ac9dc",
+        "id": "f4db0c8c.4b32f",
         "type": "template",
-        "z": "42c39222.3d0e5c",
+        "z": "27c9fb93.5d22f4",
         "name": "HTML",
         "field": "payload",
         "fieldType": "msg",
         "format": "handlebars",
         "syntax": "mustache",
-        "template": "<head>\n    <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css\" integrity=\"sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T\" crossorigin=\"anonymous\">\n    <link rel=\"stylesheet\" type=\"text/css\" href=\"/public/{{css}}\">\n</head>\n\n<body>\n    <form id=\"date-form\" class=\"form-group\" onsubmit=\"updateDate(event);\">\n        <div class=\"input-group\">\n            <input id=\"date\" class=\"form-control\" type=\"date\" value=\"{{date}}\"/>\n            <span class=\"input-group-btn\">\n                <button style=\"margin-left: 10%\" type=\"submit\" class=\"btn btn-primary\">Submit</button>\n            </span>\n        </div>\n    </form>\n    \n    <table id=\"scoreboard\" class=\"table\">\n        <tbody id=\"tbody\">\n            {{#payload}}\n                <tr>\n                    <td><img class=\"icon\" src={{visitorIcon}} /></td>\n                    <td>{{visitorPts}}</td>\n                    <td>\n                        <a href=\"/boxscore/{{gameId}}\">{{status}}</a>\n    \n                    </td>\n                    <td>{{homePts}}</td>\n                    <td><img class=\"icon\" src={{homeIcon}} /></td>\n                </tr>\n            {{/payload}}\n        </tbody>\n    </table>\n    \n    <script type=\"text/javascript\" src=\"/public/{{script}}\"></script>    \n</body>\n",
+        "template": "<form id=\"date-form\" class=\"form-group\" onsubmit=\"updateDate(event);\">\n    <div class=\"input-group\">\n        <input id=\"date\" class=\"form-control\" type=\"date\" value=\"{{date}}\"/>\n        <span class=\"input-group-btn\">\n            <button style=\"margin-left: 10%\" type=\"submit\" class=\"btn btn-primary\">Submit</button>\n        </span>\n    </div>\n</form>\n\n<table id=\"scoreboard\" class=\"table\">\n    <tbody id=\"tbody\">\n        {{#payload}}\n            <tr>\n                <td><img class=\"icon\" src={{visitorIcon}} /></td>\n                <td>{{visitorPts}}</td>\n                <td>\n                    <a href=\"/boxscore/{{gameId}}\">{{status}}</a>\n\n                </td>\n                <td>{{homePts}}</td>\n                <td><img class=\"icon\" src={{homeIcon}} /></td>\n            </tr>\n        {{/payload}}\n    </tbody>\n</table>\n",
         "output": "str",
-        "x": 910,
+        "x": 1110,
         "y": 80,
         "wires": [
             [
-                "b7a9937f.fca62"
+                "a167e41e.187f58"
             ]
         ]
     },
     {
-        "id": "1c27fa73.db5e16",
+        "id": "317e30d5.229b2",
         "type": "http in",
-        "z": "42c39222.3d0e5c",
+        "z": "27c9fb93.5d22f4",
         "name": "",
         "url": "/scoreboard",
         "method": "post",
         "upload": false,
         "swaggerDoc": "",
-        "x": 130,
-        "y": 160,
+        "x": 110,
+        "y": 200,
         "wires": [
             [
-                "eb416b6b.633688"
+                "95e1654b.659098"
             ]
         ]
     },
     {
-        "id": "42c18583.a697bc",
+        "id": "46819eef.6ddb9",
         "type": "http response",
-        "z": "42c39222.3d0e5c",
+        "z": "27c9fb93.5d22f4",
         "name": "",
         "statusCode": "",
         "headers": {},
-        "x": 890,
-        "y": 160,
+        "x": 1110,
+        "y": 200,
         "wires": []
     },
     {
-        "id": "eb416b6b.633688",
-        "type": "league",
-        "z": "42c39222.3d0e5c",
-        "name": "",
-        "league_type": "scoreboard",
-        "season": "",
-        "season_type": "Regular Season",
-        "game_date": "{{req.body.date}}",
-        "per_mode": "PerGame",
-        "player_team": "P",
-        "measure_type": "Base",
-        "ahead_behind": "Ahead or Behind",
-        "point_diff": 0,
-        "clutch_time": "Last 5 Minutes",
-        "group_quantity": "5",
-        "x": 410,
-        "y": 160,
-        "wires": [
-            [
-                "e589696b.72fec8"
-            ]
-        ]
-    },
-    {
-        "id": "df6d44ed.fc90a8",
+        "id": "898a8a6b.39ed18",
         "type": "function",
-        "z": "42c39222.3d0e5c",
+        "z": "27c9fb93.5d22f4",
         "name": "get today's date",
         "func": "var tzoffset = (new Date()).getTimezoneOffset() * 60000; \nmsg.date = (new Date(Date.now() - tzoffset)).toISOString().slice(0, 10);\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 320,
+        "x": 300,
         "y": 80,
         "wires": [
             [
-                "637a5f2a.7ae64"
+                "ebdefffe.54929"
             ]
         ]
     },
     {
-        "id": "19ae7e0c.f05b52",
+        "id": "a167e41e.187f58",
+        "type": "link out",
+        "z": "27c9fb93.5d22f4",
+        "name": "Scoreboard",
+        "links": [
+            "3867cf53.b064e",
+            "13cbe348.6a8f1d",
+            "220161cc.3a9fde"
+        ],
+        "x": 1215,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "198dbb79.129655",
         "type": "http in",
-        "z": "42c39222.3d0e5c",
+        "z": "27c9fb93.5d22f4",
         "name": "",
         "url": "/public/scoreboard.js",
         "method": "get",
         "upload": false,
         "swaggerDoc": "",
-        "x": 150,
+        "x": 130,
         "y": 320,
         "wires": [
             [
-                "8f5744d.3e547b8"
+                "282522b0.6c039e"
             ]
         ]
     },
     {
-        "id": "3778b9dc.e9bc56",
+        "id": "6662b25e.42e2cc",
         "type": "http response",
-        "z": "42c39222.3d0e5c",
+        "z": "27c9fb93.5d22f4",
         "name": "",
         "statusCode": "",
         "headers": {},
-        "x": 620,
+        "x": 600,
         "y": 320,
         "wires": []
     },
     {
-        "id": "8f5744d.3e547b8",
+        "id": "282522b0.6c039e",
         "type": "template",
-        "z": "42c39222.3d0e5c",
+        "z": "27c9fb93.5d22f4",
         "name": "javascript",
         "field": "payload",
         "fieldType": "msg",
@@ -182,18 +132,18 @@
         "syntax": "mustache",
         "template": "async function updateDate(event) {\n    event.preventDefault(); \n    var date = document.getElementById(\"date\").value;\n    var body = {\"date\": date};\n    var response = await fetch(\"/scoreboard\", {\n        \"method\": \"POST\", \n        \"body\": JSON.stringify(body),\n        \"headers\": {\"Content-Type\": \"application/json\"}\n    })\n    var data = await response.json()\n    emptyTable(); \n    addDataToTable(data);\n}\n\nfunction createIconImg(src) {\n    var img = document.createElement(\"img\");\n    img.src = src; \n    img.className = \"icon\";\n    return img; \n}\n\nfunction addDataToTable(data){\n    var tbody = document.getElementById(\"tbody\");\n    data.forEach((element, index, array) => {\n       var row = tbody.insertRow();  \n       var cell = row.insertCell(); \n       var img = createIconImg(element.visitorIcon);\n       cell.appendChild(img);\n       \n       cell = row.insertCell(); \n       cell.innerText = element.visitorPts;\n       \n       cell = row.insertCell(); \n       var a = document.createElement(\"a\");\n       a.href = \"/boxscore/\" + element.gameId;\n       a.innerText = element.status;\n       cell.appendChild(a);\n       \n       cell = row.insertCell(); \n       cell.innerText = element.homePts;\n       \n       cell = row.insertCell(); \n       img = createIconImg(element.homeIcon)\n       cell.appendChild(img);\n    });\n}\n\nfunction removeChildren(elem) {\n    while (elem.firstChild) {\n        elem.removeChild(elem.firstChild);\n    }\n}\n\nfunction emptyTable() {\n    var tbody = document.getElementById(\"tbody\");\n    removeChildren(tbody);\n}\n",
         "output": "str",
-        "x": 420,
+        "x": 400,
         "y": 320,
         "wires": [
             [
-                "3778b9dc.e9bc56"
+                "6662b25e.42e2cc"
             ]
         ]
     },
     {
-        "id": "fffe5780.e70d48",
+        "id": "3deb6d39.13f172",
         "type": "template",
-        "z": "42c39222.3d0e5c",
+        "z": "27c9fb93.5d22f4",
         "name": "CSS",
         "field": "payload",
         "fieldType": "msg",
@@ -201,69 +151,217 @@
         "syntax": "mustache",
         "template": ".icon {\n    height: 7.5vh;\n    width: auto;\n}\n\n#scoreboard {\n    width:50%;\n    margin: auto;\n}\n\n#date-form {\n    width:50%;\n    margin: auto auto 1rem auto;\n}",
         "output": "str",
-        "x": 410,
+        "x": 390,
         "y": 380,
         "wires": [
             [
-                "ad63eb60.094368"
+                "740950e7.14122"
             ]
         ]
     },
     {
-        "id": "fd46ee14.9e25d",
+        "id": "3aa633ca.4e414c",
         "type": "http in",
-        "z": "42c39222.3d0e5c",
+        "z": "27c9fb93.5d22f4",
         "name": "",
         "url": "/public/scoreboard.css",
         "method": "get",
         "upload": false,
         "swaggerDoc": "",
-        "x": 150,
+        "x": 130,
         "y": 380,
         "wires": [
             [
-                "fffe5780.e70d48"
+                "3deb6d39.13f172"
             ]
         ]
     },
     {
-        "id": "ad63eb60.094368",
+        "id": "740950e7.14122",
         "type": "http response",
-        "z": "42c39222.3d0e5c",
+        "z": "27c9fb93.5d22f4",
         "name": "",
         "statusCode": "",
         "headers": {
             "Content-Type": "text/css"
         },
-        "x": 630,
+        "x": 610,
         "y": 380,
         "wires": []
     },
     {
-        "id": "e589696b.72fec8",
-        "type": "function",
-        "z": "42c39222.3d0e5c",
-        "name": "format response",
-        "func": "var scores = msg.payload.lineScore;\nvar header = msg.payload.gameHeader; \n\nvar response = [];\n\nvar s = [];\n\nheader.forEach((element, index, array) => {\n    var home = scores.find(team => team.teamId === element.homeTeamId);\n    var visitor = scores.find(team => team.teamId === element.visitorTeamId);\n    var obj = {\n        \"visitorIcon\": \"https://raw.githubusercontent.com/Arieg419/NBA_Scorecard/master/src/client/src/img/\" + visitor.teamAbbreviation + \".png\",\n        \"visitorTeam\": visitor.teamAbbreviation,\n        \"visitorPts\": visitor.pts,\n        \"homeTeam\": home.teamAbbreviation, \n        \"homePts\": home.pts,\n        \"homeIcon\": \"https://raw.githubusercontent.com/Arieg419/NBA_Scorecard/master/src/client/src/img/\" + home.teamAbbreviation + \".png\",\n        // Old NBA game statuses are not \"Final\" like they should be\n        \"status\": (element.gameStatusText === \" \") ? \"Final\" : element.gameStatusText,\n        \"gameId\": element.gameId\n    }\n    response.push(obj);\n});\n\nmsg.script = \"scoreboard.js\";\nmsg.css = \"scoreboard.css\";\nmsg.payload = response; \n\n\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "x": 680,
-        "y": 160,
+        "id": "ebdefffe.54929",
+        "type": "league",
+        "z": "27c9fb93.5d22f4",
+        "name": "scoreboard",
+        "league_type": "scoreboard",
+        "season": "2018-19",
+        "season_type": "Regular Season",
+        "game_date": "{{date}}",
+        "per_mode": "PerGame",
+        "stat_category": "PTS",
+        "sorter": "PTS",
+        "player_or_team": "Player",
+        "measure_type": "Base",
+        "ahead_behind": "Ahead or Behind",
+        "point_diff": "",
+        "clutch_time": "Last 5 Minutes",
+        "group_quantity": "5",
+        "pt_measure_type": "CatchShoot",
+        "close_def_dist_range": "",
+        "dribble_range": "",
+        "touch_time_range": "",
+        "shot_clock_range": "",
+        "general_range": "",
+        "x": 490,
+        "y": 80,
         "wires": [
             [
-                "42c18583.a697bc"
+                "7ad4c3f9.6ae63c"
             ]
         ]
     },
     {
-        "id": "b7a9937f.fca62",
+        "id": "95e1654b.659098",
+        "type": "league",
+        "z": "27c9fb93.5d22f4",
+        "name": "scoreboard",
+        "league_type": "scoreboard",
+        "season": "2018-19",
+        "season_type": "Regular Season",
+        "game_date": "{{req.body.date}}",
+        "per_mode": "PerGame",
+        "stat_category": "PTS",
+        "sorter": "PTS",
+        "player_or_team": "Player",
+        "measure_type": "Base",
+        "ahead_behind": "Ahead or Behind",
+        "point_diff": "",
+        "clutch_time": "Last 5 Minutes",
+        "group_quantity": "5",
+        "pt_measure_type": "CatchShoot",
+        "close_def_dist_range": "",
+        "dribble_range": "",
+        "touch_time_range": "",
+        "shot_clock_range": "",
+        "general_range": "",
+        "x": 390,
+        "y": 200,
+        "wires": [
+            [
+                "7ad4c3f9.6ae63c"
+            ]
+        ]
+    },
+    {
+        "id": "7ad4c3f9.6ae63c",
+        "type": "function",
+        "z": "27c9fb93.5d22f4",
+        "name": "format response",
+        "func": "var header = msg.payload.sports_content.games.game; \n\nvar response = [];\n\nheader.forEach((game) => {\n    var home = game.home; \n    var visitor = game.visitor; \n    var obj = {\n        \"visitorIcon\": \"https://raw.githubusercontent.com/Arieg419/NBA_Scorecard/master/src/client/src/img/\" + visitor.team_key + \".png\",\n        \"visitorTeam\": visitor.team_key,\n        \"visitorPts\": visitor.score,\n        \"homeTeam\": home.team_key, \n        \"homePts\": home.score,\n        \"homeIcon\": \"https://raw.githubusercontent.com/Arieg419/NBA_Scorecard/master/src/client/src/img/\" + home.team_key + \".png\",\n        \"status\": game.period_time.period_status,\n        \"gameId\": game.id\n    }\n    response.push(obj);\n});\n\nmsg.script = \"scoreboard.js\";\nmsg.css = \"scoreboard.css\";\nmsg.payload = response; \n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 720,
+        "y": 140,
+        "wires": [
+            [
+                "14a10be5.18795c"
+            ]
+        ]
+    },
+    {
+        "id": "14a10be5.18795c",
+        "type": "switch",
+        "z": "27c9fb93.5d22f4",
+        "name": "req.method",
+        "property": "req.method",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "GET",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "POST",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 930,
+        "y": 140,
+        "wires": [
+            [
+                "f4db0c8c.4b32f"
+            ],
+            [
+                "46819eef.6ddb9"
+            ]
+        ]
+    },
+    {
+        "id": "220161cc.3a9fde",
+        "type": "link in",
+        "z": "27c9fb93.5d22f4",
+        "name": "Render",
+        "links": [
+            "6f04b46b.aebf4c",
+            "ce87bc5c.6da2",
+            "1149517.f7753af",
+            "3e961365.f7699c",
+            "b5ec5b43.b16828",
+            "609d03f1.35666c",
+            "8caa9b06.428e28",
+            "96990762.9b1898",
+            "a167e41e.187f58",
+            "3280a0a0.92805",
+            "dc05fa7c.6de4d8",
+            "dbfa7c7.675528",
+            "8277d77b.0f2798",
+            "2fa36897.334258",
+            "cf043fe5.aa0cf",
+            "9bb29777.a44a08",
+            "73e4455.40aeebc"
+        ],
+        "x": 35,
+        "y": 480,
+        "wires": [
+            [
+                "bec08f9.0b2b5f"
+            ]
+        ]
+    },
+    {
+        "id": "bec08f9.0b2b5f",
+        "type": "template",
+        "z": "27c9fb93.5d22f4",
+        "name": "main template",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<!doctype html>\n<html lang=\"en\">\n  <!-- Using https://getbootstrap.com/docs/4.0/examples/jumbotron/# as a framework-->\n  <head>\n    <meta charset=\"utf-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"> \n    <meta name=\"description\" content=\"\">\n    <meta name=\"author\" content=\"\">\n    {{!--<link rel=\"icon\" href=\"../../../../favicon.ico\">--}}\n\n    <title>NBA</title>\n\n    <!-- Bootstrap core CSS -->\n    <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css\" integrity=\"sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T\" crossorigin=\"anonymous\">\n    <!-- Custom styles for this template -->\n    <link rel=\"stylesheet\" type=\"text/css\" href=\"/public/{{css}}\">\n    \n    <style>\n        body {\n          padding-top: 5rem;\n        }\n        @media (max-width: 575.98px) {\n            .display-3 {\n                font-size: 1.75rem;\n                font-weight: 300;\n                line-height: 1.0;\n            }\n        }\n    </style>\n  </head>\n\n  <body>\n\n    <nav class=\"navbar navbar-expand-md navbar-dark fixed-top bg-dark\">\n      <a class=\"navbar-brand\" href=\"#\"></a>\n      <button class=\"navbar-toggler\" type=\"button\" data-toggle=\"collapse\" data-target=\"#navigationbar\" aria-controls=\"navbarsExampleDefault\" aria-expanded=\"false\" aria-label=\"Toggle navigation\">\n        <span class=\"navbar-toggler-icon\"></span>\n      </button>\n      \n      <div class=\"collapse navbar-collapse\" id=\"navigationbar\">\n        <ul class=\"navbar-nav mr-auto\">\n          <li class=\"nav-item active\">\n            <a class=\"nav-link\" href=\"#\">Home <span class=\"sr-only\" target=\"_blank\">(current)</span></a>\n          </li>\n          <li class=\"nav-item\">\n            <a class=\"nav-link\" href=\"https://github.com/jcostello93/node-red-contrib-nba\" target=\"_blank\">GitHub</a>\n          </li>\n          <li class=\"nav-item\">\n            <a class=\"nav-link\" href=\"https://github.com/jcostello93/node-red-contrib-node-reddit/blob/master/README.md#example-flows\" target=\"_blank\">Example flows</a>\n          </li>\n          <li class=\"nav-item\">\n            <a class=\"nav-link\" href=\"https://github.com/jcostello93/node-red-contrib-node-reddit/wiki\" target=\"_blank\">Docs</a>\n          </li>\n          <li class=\"nav-item\">\n            <a class=\"nav-link\" href=\"https://npmjs.com/package/node-red-contrib-node-reddit\" target=\"_blank\">NPM</a>\n          </li>\n          <li class=\"nav-item\">\n            <a class=\"nav-link\" href=\"https://node-reddit-demo.eu-gb.mybluemix.net/red\" target=\"_blank\">Demo app</a>\n          </li>\n          <li class=\"nav-item dropdown\">\n            <a class=\"nav-link dropdown-toggle\" id=\"dropdown01\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">Example clients</a>\n            <div class=\"dropdown-menu\" aria-labelledby=\"dropdown01\">\n              <a class=\"dropdown-item\" href=\"/lineups\">Lineups</a>\n              <a class=\"dropdown-item\" href=\"/scoreboard\">Scoreboard</a>\n              <a class=\"dropdown-item\" href=\"/standings\">Standings</a>\n            </div>\n          </li>\n        </ul>\n      </div>\n    </nav>\n\n    <main role=\"main\">\n        {{{payload}}}\n    </main>\n\n    <footer class=\"container\">\n      <p><a href=\"https://github.com/jcostello93/node-red-contrib-node-reddit/wiki#contributors\" target=\"_blank\">Contributors</a></p>\n    </footer>\n\n    <!-- Bootstrap core JavaScript\n    ================================================== -->\n    <!-- Placed at the end of the document so the pages load faster -->\n    <script type=\"text/javascript\" src=\"/public/{{script}}\"></script>\n    \n    <script src=\"https://code.jquery.com/jquery-3.3.1.slim.min.js\" integrity=\"sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo\" crossorigin=\"anonymous\"></script>\n    <script src=\"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js\" integrity=\"sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1\" crossorigin=\"anonymous\"></script>\n    <script src=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js\" integrity=\"sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM\" crossorigin=\"anonymous\"></script>\n  </body>\n</html>\n",
+        "output": "str",
+        "x": 175,
+        "y": 480,
+        "wires": [
+            [
+                "d79b475.090b7b8"
+            ]
+        ]
+    },
+    {
+        "id": "d79b475.090b7b8",
         "type": "http response",
-        "z": "42c39222.3d0e5c",
+        "z": "27c9fb93.5d22f4",
         "name": "",
         "statusCode": "",
         "headers": {},
-        "x": 1060,
-        "y": 80,
+        "x": 395,
+        "y": 480,
         "wires": []
     }
 ]
