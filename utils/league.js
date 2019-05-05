@@ -7,7 +7,7 @@ var playerTeamHelper = nba_helper.playerTeamHelper;
 
 function getLeagueMethodDict() {
     var method_dict = {
-        "scoreboard": NBA.stats.scoreboard,
+        "scoreboard": getScoreboard,
         "leaders": NBA.stats.leagueLeaders,
         "standings": NBA.stats.leagueStandings,
         "game log": NBA.stats.leagueGameLog,
@@ -77,7 +77,7 @@ function getLeagueProps(n, msg) {
 
 function getLeagueParamsDict(props) {
     var params_dict = {
-        "scoreboard": {gameDate: props.game_date},
+        "scoreboard": {game_date: props.game_date},
         "leaders": {Season: props.season, SeasonType: props.season_type, PerMode: props.per_mode, StatCategory: props.stat_category},
         "standings": {Season: props.season, SeasonType: props.season_type},
         "game log": {PlayerOrTeam: props.player_or_team, Season: props.season, SeasonType: props.season_type, Sorter: props.sorter},
@@ -106,6 +106,15 @@ function getLeagueSchedule(params) {
 function getPlayoffsBracket(params) {
     return new Promise((resolve, reject) => {
         NBA.data.playoffsBracket(params.season.substring(0, 4))
+        .then(body => { resolve(body); })
+        .catch (err => { reject(err); })
+    })
+}
+
+function getScoreboard(params) {
+    var game_date = params.game_date.replace(/-/g, "").replace(/\//g, '');
+    return new Promise((resolve, reject) => {
+        NBA.data.scoreboard(game_date)
         .then(body => { resolve(body); })
         .catch (err => { reject(err); })
     })
